@@ -1,0 +1,11 @@
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/bin/Debug/net10.0/CRM.Domain.deps.json
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/bin/Debug/net10.0/CRM.Domain.dll
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/bin/Debug/net10.0/CRM.Domain.pdb
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/Debug/net10.0/CRM.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/Debug/net10.0/CRM.Domain.AssemblyInfoInputs.cache
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/Debug/net10.0/CRM.Domain.AssemblyInfo.cs
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/Debug/net10.0/CRM.Domain.csproj.CoreCompileInputs.cache
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/Debug/net10.0/CRM.Domain.dll
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/Debug/net10.0/refint/CRM.Domain.dll
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/Debug/net10.0/CRM.Domain.pdb
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/Debug/net10.0/ref/CRM.Domain.dll

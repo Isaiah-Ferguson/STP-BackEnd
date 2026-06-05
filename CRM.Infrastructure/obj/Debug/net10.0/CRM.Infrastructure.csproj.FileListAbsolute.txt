@@ -1,0 +1,17 @@
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/bin/Debug/net10.0/CRM.Infrastructure.deps.json
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/bin/Debug/net10.0/CRM.Infrastructure.dll
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/bin/Debug/net10.0/CRM.Infrastructure.pdb
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/bin/Debug/net10.0/CRM.Application.dll
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/bin/Debug/net10.0/CRM.Domain.dll
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/bin/Debug/net10.0/CRM.Application.pdb
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/bin/Debug/net10.0/CRM.Domain.pdb
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/CRM.Infrastructure.csproj.AssemblyReference.cache
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/CRM.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/CRM.Infrastructure.AssemblyInfoInputs.cache
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/CRM.Infrastructure.AssemblyInfo.cs
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/CRM.Infrastructure.csproj.CoreCompileInputs.cache
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/CRM.Infr.2D6F64BC.Up2Date
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/CRM.Infrastructure.dll
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/refint/CRM.Infrastructure.dll
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/CRM.Infrastructure.pdb
+/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/obj/Debug/net10.0/ref/CRM.Infrastructure.dll
