@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "TubeVR2itNo=",
+  "success": true,
+  "projectFilePath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/CRM.Infrastructure.csproj",
+  "expectedPackageFiles": [
+    "/Users/isaiahkeithferguson/.nuget/packages/microsoft.extensions.configuration.abstractions/9.0.5/microsoft.extensions.configuration.abstractions.9.0.5.nupkg.sha512",
+    "/Users/isaiahkeithferguson/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.5/microsoft.extensions.dependencyinjection.abstractions.9.0.5.nupkg.sha512",
+    "/Users/isaiahkeithferguson/.nuget/packages/microsoft.extensions.primitives/9.0.5/microsoft.extensions.primitives.9.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}
