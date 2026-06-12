@@ -1,34 +1,41 @@
+using CRM.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRM.Persistence;
 
-/// <summary>
-/// The main EF Core database context for the CRM application.
-/// 
-/// This context connects to Azure SQL (SQL Server) via the connection string
-/// defined in appsettings.json under "ConnectionStrings:DefaultConnection".
-/// 
-/// To add a new entity later:
-///   1. Create the entity class in CRM.Domain/Entities/
-///   2. Add a DbSet here: public DbSet<MyEntity> MyEntities { get; set; }
-///   3. Run: dotnet ef migrations add <MigrationName> --project CRM.Persistence --startup-project CRM.API
-///   4. Run: dotnet ef database update --project CRM.Persistence --startup-project CRM.API
-/// </summary>
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    // TODO: Add DbSet properties here as entities are created.
-    // Example:
-    // public DbSet<Contact> Contacts { get; set; }
+    public DbSet<CrmProgram> Programs { get; set; }
+    public DbSet<Participant> Participants { get; set; }
+    public DbSet<StaffMember> Staff { get; set; }
+    public DbSet<StaffProgramAssignment> StaffProgramAssignments { get; set; }
+    public DbSet<Session> Sessions { get; set; }
+    public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
+    public DbSet<AttendanceNote> AttendanceNotes { get; set; }
+    public DbSet<CalendarEvent> CalendarEvents { get; set; }
+    public DbSet<Project> Projects { get; set; }
+    public DbSet<ProjectTask> Tasks { get; set; }
+    public DbSet<Script> Scripts { get; set; }
+    public DbSet<ScriptProgram> ScriptPrograms { get; set; }
+    public DbSet<DocumentRecord> DocumentRecords { get; set; }
+    public DbSet<OnboardingItem> OnboardingItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+    }
 
-        // TODO: Apply entity configurations here.
-        // Example: modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        foreach (var entry in ChangeTracker.Entries<Domain.Common.BaseEntity>())
+        {
+            if (entry.State == EntityState.Modified)
+                entry.Entity.UpdatedAt = now;
+        }
+        return base.SaveChangesAsync(cancellationToken);
     }
 }

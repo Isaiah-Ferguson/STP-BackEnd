@@ -1,25 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj": {}
+    "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj": {}
   },
   "projects": {
-    "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj": {
+    "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj",
         "projectName": "CRM.Domain",
-        "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj",
-        "packagesPath": "/Users/isaiahkeithferguson/.nuget/packages/",
-        "outputPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/",
+        "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj",
+        "packagesPath": "C:\\Users\\Ifergusonlll.DPJPA\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/isaiahkeithferguson/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Ifergusonlll.DPJPA\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -59,7 +66,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

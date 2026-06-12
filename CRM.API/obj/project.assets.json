@@ -3454,38 +3454,46 @@
     ]
   },
   "packageFolders": {
-    "/Users/isaiahkeithferguson/.nuget/packages/": {}
+    "C:\\Users\\Ifergusonlll.DPJPA\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.API/CRM.API.csproj",
+      "projectUniqueName": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.API\\CRM.API.csproj",
       "projectName": "CRM.API",
-      "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.API/CRM.API.csproj",
-      "packagesPath": "/Users/isaiahkeithferguson/.nuget/packages/",
-      "outputPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.API/obj/",
+      "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.API\\CRM.API.csproj",
+      "packagesPath": "C:\\Users\\Ifergusonlll.DPJPA\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.API\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/Users/isaiahkeithferguson/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Ifergusonlll.DPJPA\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Application/CRM.Application.csproj": {
-              "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Application/CRM.Application.csproj"
+            "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Application\\CRM.Application.csproj": {
+              "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Application\\CRM.Application.csproj"
             },
-            "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/CRM.Infrastructure.csproj": {
-              "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Infrastructure/CRM.Infrastructure.csproj"
+            "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Infrastructure\\CRM.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Infrastructure\\CRM.Infrastructure.csproj"
             },
-            "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Persistence/CRM.Persistence.csproj": {
-              "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Persistence/CRM.Persistence.csproj"
+            "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Persistence\\CRM.Persistence.csproj": {
+              "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Persistence\\CRM.Persistence.csproj"
             }
           }
         }
@@ -3536,7 +3544,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.101/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

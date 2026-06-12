@@ -1,0 +1,62 @@
+# ── Build outputs ─────────────────────────────────────────────────────────────
+bin/
+obj/
+out/
+publish/
+artifacts/
+tempbuild/
+*.nupkg
+*.snupkg
+
+# ── Visual Studio / Rider ─────────────────────────────────────────────────────
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# ── Runtime artifacts ─────────────────────────────────────────────────────────
+*.dll
+*.exe
+*.pdb
+
+# ── Secrets / environment ─────────────────────────────────────────────────────
+# Block ALL appsettings variants — templates must be committed explicitly below
+**/appsettings*.json
+!**/appsettings*.json.template
+.env
+.env.*
+secrets.json
+**/secrets.json
+**/*secrets*.json
+**/*connectionstrings*.json
+
+# ── Database ──────────────────────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+RESET_DATABASE.sql
+SIMPLE_RESET.sql
+reset-database.sh
+
+# ── Azure deployment ──────────────────────────────────────────────────────────
+*.zip
+LogFiles/
+deployments/
+deploy/
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+*.swp
+*.swo
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+logs/
+*.log
+
