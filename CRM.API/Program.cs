@@ -15,7 +15,10 @@ builder.Services.AddPersistenceServices(builder.Configuration);
 // ---------------------------------------------------------
 // Controllers
 // ---------------------------------------------------------
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+        opts.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter()));
 
 // ---------------------------------------------------------
 // Swagger / OpenAPI
