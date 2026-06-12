@@ -1,10 +1,12 @@
 using CRM.Application.DTOs.Participants;
 using CRM.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRM.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class ParticipantsController : ControllerBase
 {

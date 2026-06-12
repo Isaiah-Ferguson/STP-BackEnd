@@ -73,8 +73,7 @@ public class TaskService : ITaskService
         await _uow.Tasks.AddAsync(task);
         await _uow.SaveChangesAsync();
 
-        var staff = await _uow.Staff.GetAllAsync();
-        return ToTaskDto(task, staff.ToDictionary(s => s.Id));
+        return ToTaskDto(task, await BuildStaffMapAsync(task.AssignedToId));
     }
 
     public async Task<ProjectTaskDto?> UpdateTaskAsync(Guid taskId, UpdateTaskDto dto)
@@ -92,8 +91,14 @@ public class TaskService : ITaskService
         await _uow.Tasks.UpdateAsync(task);
         await _uow.SaveChangesAsync();
 
-        var staff = await _uow.Staff.GetAllAsync();
-        return ToTaskDto(task, staff.ToDictionary(s => s.Id));
+        return ToTaskDto(task, await BuildStaffMapAsync(task.AssignedToId));
+    }
+
+    private async Task<Dictionary<Guid, StaffMember>> BuildStaffMapAsync(Guid? assignedToId)
+    {
+        if (assignedToId is null) return new();
+        var member = await _uow.Staff.GetByIdAsync(assignedToId.Value);
+        return member is not null ? new() { [member.Id] = member } : new();
     }
 
     private static ProjectTaskDto ToTaskDto(ProjectTask t, Dictionary<Guid, StaffMember> staffMap)

@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<ScriptProgram> ScriptPrograms { get; set; }
     public DbSet<DocumentRecord> DocumentRecords { get; set; }
     public DbSet<OnboardingItem> OnboardingItems { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

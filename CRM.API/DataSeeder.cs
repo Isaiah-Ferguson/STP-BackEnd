@@ -1,3 +1,4 @@
+using CRM.Application.Interfaces;
 using CRM.Domain.Entities;
 using CRM.Domain.Enums;
 using CRM.Persistence;
@@ -7,6 +8,27 @@ namespace CRM.API;
 
 public static class DataSeeder
 {
+    /// <summary>
+    /// Seeds a default admin login for local development if no users exist.
+    /// Credentials: admin@shiningstars.org / ChangeMe!123
+    /// </summary>
+    public static async Task SeedAdminUserAsync(AppDbContext db, IPasswordHasher hasher)
+    {
+        if (await db.Users.AnyAsync()) return;
+
+        var (hash, salt) = hasher.HashPassword("ChangeMe!123");
+        db.Users.Add(new User
+        {
+            Email = "admin@shiningstars.org",
+            FullName = "Site Administrator",
+            PasswordHash = hash,
+            PasswordSalt = salt,
+            Role = UserRole.Admin,
+            IsActive = true,
+        });
+        await db.SaveChangesAsync();
+    }
+
     public static async Task SeedAsync(AppDbContext db)
     {
         if (await db.Programs.AnyAsync()) return;

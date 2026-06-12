@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using CRM.Application.Interfaces;
 using CRM.Domain.Common;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,16 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
 
     public async Task<IReadOnlyList<T>> GetAllAsync() =>
         await _set.AsNoTracking().ToListAsync();
+
+    public async Task<IReadOnlyList<T>> ListAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken ct = default)
+    {
+        var query = _set.AsNoTracking();
+        if (predicate is not null) query = query.Where(predicate);
+        return await query.ToListAsync(ct);
+    }
+
+    public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default) =>
+        await _set.AsNoTracking().FirstOrDefaultAsync(predicate, ct);
 
     public async Task<T> AddAsync(T entity)
     {

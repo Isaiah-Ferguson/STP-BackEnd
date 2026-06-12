@@ -26,7 +26,8 @@ public class CalendarService : ICalendarService
 
     public async Task<CalendarEventDto> CreateEventAsync(CreateCalendarEventDto dto)
     {
-        var date = DateTime.Parse(dto.Date, null, System.Globalization.DateTimeStyles.RoundtripKind);
+        if (!DateTime.TryParse(dto.Date, null, System.Globalization.DateTimeStyles.RoundtripKind, out var date))
+            throw new ArgumentException($"Invalid date format: '{dto.Date}'. Expected ISO 8601.");
 
         var ev = new CalendarEvent
         {
@@ -58,6 +59,6 @@ public class CalendarService : ICalendarService
         TimeRange = e.TimeRange,
         ProgramId = e.ProgramId,
         ProgramName = e.ProgramId.HasValue ? programMap.GetValueOrDefault(e.ProgramId.Value) : null,
-        IsUpcoming = e.IsUpcoming,
+        IsUpcoming = e.Date >= DateTime.UtcNow,
     };
 }

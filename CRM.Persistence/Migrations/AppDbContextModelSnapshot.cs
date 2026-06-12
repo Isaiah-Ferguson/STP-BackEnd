@@ -539,6 +539,60 @@ namespace CRM.Persistence.Migrations
                     b.ToTable("StaffProgramAssignments");
                 });
 
+            modelBuilder.Entity("CRM.Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("PasswordSalt")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("StaffMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("StaffMemberId");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("CRM.Domain.Entities.AttendanceNote", b =>
                 {
                     b.HasOne("CRM.Domain.Entities.AttendanceRecord", "AttendanceRecord")
@@ -675,6 +729,16 @@ namespace CRM.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Program");
+
+                    b.Navigation("StaffMember");
+                });
+
+            modelBuilder.Entity("CRM.Domain.Entities.User", b =>
+                {
+                    b.HasOne("CRM.Domain.Entities.StaffMember", "StaffMember")
+                        .WithMany()
+                        .HasForeignKey("StaffMemberId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("StaffMember");
                 });
