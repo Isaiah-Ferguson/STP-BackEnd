@@ -327,3 +327,4 @@ C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API
 C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\obj\Debug\net10.0\CRM.API.csproj.Up2Date
 C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\obj\Debug\net10.0\CRM.API.genruntimeconfig.cache
 C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\obj\Debug\net10.0\ref\CRM.API.dll
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

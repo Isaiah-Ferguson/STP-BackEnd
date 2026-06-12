@@ -1,3 +1,5 @@
+using CRM.Application.Interfaces;
+using CRM.Infrastructure.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,11 +15,12 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // TODO: Register external service clients here.
-        // Examples:
-        //   - Azure Blob Storage client
-        //   - Email service (SendGrid, SMTP, etc.)
-        //   - Third-party API clients
+        // --- Authentication primitives ---
+        services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddSingleton<ITokenService, TokenService>();
+
+        // TODO: Register external service clients here (Blob storage, email, etc.)
 
         return services;
     }

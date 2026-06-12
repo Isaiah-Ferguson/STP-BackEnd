@@ -34,3 +34,23 @@ public class UpdateAttendanceDto
 {
     public AttendanceStatus Status { get; set; }
 }
+
+/// <summary>A single participant row in today's cross-program attendance roster.</summary>
+public class AttendanceRosterEntryDto
+{
+    public Guid RecordId { get; set; }
+    public Guid ParticipantId { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string Initials { get; set; } = string.Empty;
+    public Guid ProgramId { get; set; }
+    public string ProgramSlug { get; set; } = string.Empty;
+    public string ProgramName { get; set; } = string.Empty;
+    public AttendanceStatus Status { get; set; }
+    public List<AttendanceNoteDto> Notes { get; set; } = new();
+}
+
+public class CreateAttendanceNoteDto
+{
+    public string Content { get; set; } = string.Empty;
+    public string NoteType { get; set; } = "observation";
+}

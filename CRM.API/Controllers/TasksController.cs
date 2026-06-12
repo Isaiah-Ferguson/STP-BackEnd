@@ -1,10 +1,12 @@
 using CRM.Application.DTOs.Tasks;
 using CRM.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRM.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api")]
 public class TasksController : ControllerBase
 {
@@ -27,7 +29,7 @@ public class TasksController : ControllerBase
     public async Task<ActionResult<ProjectTaskDto>> AddTask(Guid projectId, [FromBody] CreateTaskDto dto)
     {
         var result = await _service.AddTaskAsync(projectId, dto);
-        return Ok(result);
+        return CreatedAtAction(nameof(GetProjects), new { }, result);
     }
 
     [HttpPut("tasks/{taskId:guid}")]

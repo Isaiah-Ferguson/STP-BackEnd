@@ -15,9 +15,22 @@ public class StaffService : IStaffService
     {
         var staff = await _uow.Staff.GetAllAsync();
         var programs = await _uow.Programs.GetAllAsync();
-        var programMap = programs.ToDictionary(p => p.Id, p => p.Name);
+        var assignments = await _uow.GetStaffProgramAssignmentsAsync();
 
-        return staff.Select(s => ToSummary(s, programMap)).ToList();
+        var programMap = programs.ToDictionary(p => p.Id, p => p.Name);
+        var assignmentsByStaff = assignments
+            .GroupBy(a => a.StaffMemberId)
+            .ToDictionary(g => g.Key, g => g.Select(a => a.ProgramId).ToList());
+
+        return staff.Select(s =>
+        {
+            var progIds = assignmentsByStaff.GetValueOrDefault(s.Id, new());
+            var progNames = progIds
+                .Select(id => programMap.GetValueOrDefault(id))
+                .OfType<string>()
+                .ToList();
+            return ToSummary(s, progNames);
+        }).ToList();
     }
 
     public async Task<StaffDetailDto?> GetByIdAsync(Guid id)
@@ -26,7 +39,15 @@ public class StaffService : IStaffService
         if (s is null) return null;
 
         var programs = await _uow.Programs.GetAllAsync();
+        var assignments = await _uow.GetStaffProgramAssignmentsAsync();
+        var onboardingItems = await _uow.OnboardingItems.ListAsync(o => o.StaffMemberId == id);
+
         var programMap = programs.ToDictionary(p => p.Id, p => p.Name);
+        var progNames = assignments
+            .Where(a => a.StaffMemberId == id)
+            .Select(a => programMap.GetValueOrDefault(a.ProgramId))
+            .OfType<string>()
+            .ToList();
 
         return new StaffDetailDto
         {
@@ -36,8 +57,16 @@ public class StaffService : IStaffService
             Role = s.Role,
             StartDate = s.StartDate.ToString("yyyy-MM-dd"),
             OnboardingProgressPct = s.OnboardingProgressPct,
-            ProgramNames = new(),
-            OnboardingItems = new(),
+            ProgramNames = progNames,
+            OnboardingItems = onboardingItems.Select(o => new OnboardingItemDto
+            {
+                Id = o.Id,
+                Section = o.Section,
+                Label = o.Label,
+                IsCompleted = o.IsCompleted,
+                CompletedDate = o.CompletedDate?.ToString("yyyy-MM-dd"),
+                ExpiryDate = o.ExpiryDate?.ToString("yyyy-MM-dd"),
+            }).ToList(),
         };
     }
 
@@ -53,6 +82,17 @@ public class StaffService : IStaffService
 
         await _uow.Staff.AddAsync(member);
         await _uow.SaveChangesAsync();
+
+        if (dto.ProgramIds is { Count: > 0 })
+        {
+            foreach (var progId in dto.ProgramIds)
+                await _uow.AddStaffProgramAssignmentAsync(new StaffProgramAssignment
+                {
+                    StaffMemberId = member.Id,
+                    ProgramId = progId,
+                });
+            await _uow.SaveChangesAsync();
+        }
 
         return (await GetByIdAsync(member.Id))!;
     }
@@ -72,7 +112,7 @@ public class StaffService : IStaffService
         return await GetByIdAsync(id);
     }
 
-    private static StaffSummaryDto ToSummary(StaffMember s, Dictionary<Guid, string> programMap) =>
+    private static StaffSummaryDto ToSummary(StaffMember s, List<string> programNames) =>
         new()
         {
             Id = s.Id,
@@ -81,6 +121,6 @@ public class StaffService : IStaffService
             Role = s.Role,
             StartDate = s.StartDate.ToString("yyyy-MM-dd"),
             OnboardingProgressPct = s.OnboardingProgressPct,
-            ProgramNames = new(),
+            ProgramNames = programNames,
         };
 }
