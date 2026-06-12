@@ -17,7 +17,8 @@ public class ParticipantService : IParticipantService
         var programs = await _uow.Programs.GetAllAsync();
         var programMap = programs.ToDictionary(p => p.Id, p => p.Name);
 
-        return participants.Select(p => ToSummary(p, programMap)).ToList();
+        var slugMap = programs.ToDictionary(p => p.Id, p => p.Slug);
+        return participants.Select(p => ToSummary(p, programMap, slugMap)).ToList();
     }
 
     public async Task<ParticipantDetailDto?> GetByIdAsync(Guid id)
@@ -26,7 +27,7 @@ public class ParticipantService : IParticipantService
         if (p is null) return null;
 
         var programs = await _uow.Programs.GetAllAsync();
-        var programName = programs.FirstOrDefault(pr => pr.Id == p.ProgramId)?.Name ?? string.Empty;
+        var prog = programs.FirstOrDefault(pr => pr.Id == p.ProgramId);
 
         return new ParticipantDetailDto
         {
@@ -35,7 +36,8 @@ public class ParticipantService : IParticipantService
             Initials = p.Initials,
             Status = p.Status,
             ProgramId = p.ProgramId,
-            ProgramName = programName,
+            ProgramName = prog?.Name ?? string.Empty,
+            ProgramSlug = prog?.Slug ?? string.Empty,
             AttendancePct = p.AttendancePct,
             StartDate = p.StartDate.ToString("yyyy-MM-dd"),
             HasDocAlerts = false,
@@ -93,7 +95,10 @@ public class ParticipantService : IParticipantService
         return true;
     }
 
-    private static ParticipantSummaryDto ToSummary(Participant p, Dictionary<Guid, string> programMap) =>
+    private static ParticipantSummaryDto ToSummary(
+        Participant p,
+        Dictionary<Guid, string> programMap,
+        Dictionary<Guid, string>? slugMap = null) =>
         new()
         {
             Id = p.Id,
@@ -102,6 +107,7 @@ public class ParticipantService : IParticipantService
             Status = p.Status,
             ProgramId = p.ProgramId,
             ProgramName = programMap.GetValueOrDefault(p.ProgramId, string.Empty),
+            ProgramSlug = slugMap?.GetValueOrDefault(p.ProgramId, string.Empty) ?? string.Empty,
             AttendancePct = p.AttendancePct,
             StartDate = p.StartDate.ToString("yyyy-MM-dd"),
             HasDocAlerts = false,
