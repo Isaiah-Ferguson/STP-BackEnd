@@ -1,0 +1,32 @@
+using CRM.Application.DTOs.Calendar;
+using CRM.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace CRM.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class CalendarController : ControllerBase
+{
+    private readonly ICalendarService _service;
+
+    public CalendarController(ICalendarService service) => _service = service;
+
+    [HttpGet("events")]
+    public async Task<ActionResult<IReadOnlyList<CalendarEventDto>>> GetEvents(
+        [FromQuery] int month,
+        [FromQuery] int year)
+    {
+        if (month < 1 || month > 12 || year < 2020)
+            return BadRequest("Invalid month or year.");
+
+        return Ok(await _service.GetEventsAsync(month, year));
+    }
+
+    [HttpPost("events")]
+    public async Task<ActionResult<CalendarEventDto>> CreateEvent([FromBody] CreateCalendarEventDto dto)
+    {
+        var result = await _service.CreateEventAsync(dto);
+        return Ok(result);
+    }
+}
