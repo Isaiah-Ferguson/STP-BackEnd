@@ -10,6 +10,7 @@ public class ParticipantSummaryDto
     public ParticipantStatus Status { get; set; }
     public Guid ProgramId { get; set; }
     public string ProgramName { get; set; } = string.Empty;
+    public string ProgramSlug { get; set; } = string.Empty;
     public int AttendancePct { get; set; }
     public string StartDate { get; set; } = string.Empty;
     public bool HasDocAlerts { get; set; }

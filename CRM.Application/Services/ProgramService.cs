@@ -74,10 +74,8 @@ public class ProgramService : IProgramService
             .Take(5)
             .ToList();
 
-        var staffAssignments = (await _uow.Programs.GetAllAsync())
-            .Where(p => p.Id == program.Id).ToList();
-
         var allStaff = await _uow.Staff.GetAllAsync();
+        var allAssignments = (await _uow.Programs.GetAllAsync()); // nav not loaded; use UoW.Staff approach below
 
         var summary = await GetBySlugAsync(slug);
 

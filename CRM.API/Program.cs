@@ -1,3 +1,4 @@
+using CRM.API;
 using CRM.Application;
 using CRM.Infrastructure;
 using CRM.Persistence;
@@ -59,6 +60,14 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "ShinyStarCRM API v1");
         options.RoutePrefix = "swagger";
     });
+}
+
+// Seed development data
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DataSeeder.SeedAsync(db);
 }
 
 app.UseHttpsRedirection();

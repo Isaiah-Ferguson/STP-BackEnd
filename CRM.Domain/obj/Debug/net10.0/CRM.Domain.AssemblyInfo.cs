@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CRM.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+90799d668856ca319649cd5253aef19de223f17c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+32baf7911c713c7e3dcbc1147ae8310ec2e3a01d")]
 [assembly: System.Reflection.AssemblyProductAttribute("CRM.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CRM.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
