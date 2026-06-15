@@ -96,7 +96,7 @@ builder.Services.AddSwaggerGen(options =>
 // CORS — allow the Next.js frontend (localhost:3000)
 // ---------------------------------------------------------
 var frontendOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? ["http://localhost:3000"];
+    ?? ["http://localhost:3000", "https://ssp-mock-up.vercel.app"];
 
 builder.Services.AddCors(options =>
 {
