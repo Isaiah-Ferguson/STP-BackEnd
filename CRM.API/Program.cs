@@ -31,8 +31,9 @@ builder.Services.AddControllers()
 // JWT authentication
 // ---------------------------------------------------------
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var jwtKey = jwtSection["Key"]
-    ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
+var jwtKey = jwtSection["Key"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+    throw new InvalidOperationException("Missing configuration: Jwt:Key — set the Jwt__Key environment variable in Azure App Service.");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
