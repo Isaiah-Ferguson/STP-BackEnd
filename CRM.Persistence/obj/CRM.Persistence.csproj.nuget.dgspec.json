@@ -1,40 +1,33 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Persistence\\CRM.Persistence.csproj": {}
+    "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Persistence/CRM.Persistence.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Application\\CRM.Application.csproj": {
+    "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Application/CRM.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Application\\CRM.Application.csproj",
+        "projectUniqueName": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Application/CRM.Application.csproj",
         "projectName": "CRM.Application",
-        "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Application\\CRM.Application.csproj",
-        "packagesPath": "C:\\Users\\Ifergusonlll.DPJPA\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Application\\obj\\",
+        "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Application/CRM.Application.csproj",
+        "packagesPath": "/Users/isaiahkeithferguson/.nuget/packages/",
+        "outputPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Application/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Ifergusonlll.DPJPA\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/isaiahkeithferguson/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj": {
-                "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj"
+              "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj": {
+                "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj"
               }
             }
           }
@@ -76,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.101/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -354,29 +347,22 @@
         }
       }
     },
-    "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj": {
+    "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj",
+        "projectUniqueName": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj",
         "projectName": "CRM.Domain",
-        "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj",
-        "packagesPath": "C:\\Users\\Ifergusonlll.DPJPA\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\obj\\",
+        "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj",
+        "packagesPath": "/Users/isaiahkeithferguson/.nuget/packages/",
+        "outputPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Ifergusonlll.DPJPA\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/isaiahkeithferguson/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -416,7 +402,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.101/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -694,40 +680,33 @@
         }
       }
     },
-    "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Persistence\\CRM.Persistence.csproj": {
+    "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Persistence/CRM.Persistence.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Persistence\\CRM.Persistence.csproj",
+        "projectUniqueName": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Persistence/CRM.Persistence.csproj",
         "projectName": "CRM.Persistence",
-        "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Persistence\\CRM.Persistence.csproj",
-        "packagesPath": "C:\\Users\\Ifergusonlll.DPJPA\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Persistence\\obj\\",
+        "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Persistence/CRM.Persistence.csproj",
+        "packagesPath": "/Users/isaiahkeithferguson/.nuget/packages/",
+        "outputPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Persistence/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Ifergusonlll.DPJPA\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/isaiahkeithferguson/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Application\\CRM.Application.csproj": {
-                "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Application\\CRM.Application.csproj"
+              "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Application/CRM.Application.csproj": {
+                "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Application/CRM.Application.csproj"
               },
-              "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj": {
-                "projectPath": "C:\\Users\\Ifergusonlll.DPJPA\\Desktop\\Repo\\ShootingStarProject\\STP-BackEnd\\CRM.Domain\\CRM.Domain.csproj"
+              "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj": {
+                "projectPath": "/Users/isaiahkeithferguson/Desktop/ShinyStarProjectCRM/backend/CRM.Domain/CRM.Domain.csproj"
               }
             }
           }
@@ -779,7 +758,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.101/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
