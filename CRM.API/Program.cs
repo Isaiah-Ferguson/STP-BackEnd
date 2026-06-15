@@ -124,15 +124,18 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Seed development data
-if (app.Environment.IsDevelopment())
+// Always apply pending migrations on startup
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
     await db.Database.MigrateAsync();
-    await DataSeeder.SeedAsync(db);
-    await DataSeeder.SeedAdminUserAsync(db, hasher);
+
+    if (app.Environment.IsDevelopment())
+    {
+        var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+        await DataSeeder.SeedAsync(db);
+        await DataSeeder.SeedAdminUserAsync(db, hasher);
+    }
 }
 
 app.UseExceptionHandler();
