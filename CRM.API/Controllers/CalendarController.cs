@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CRM.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class CalendarController : ControllerBase
 {
