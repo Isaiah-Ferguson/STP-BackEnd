@@ -326,6 +326,47 @@ public class AttendanceService : IAttendanceService
             .ToList();
     }
 
+    public async Task<IReadOnlyList<AttendanceRosterEntryDto>> GetTodayRosterReadOnlyAsync()
+    {
+        var today = DateTime.UtcNow.Date;
+        var tomorrow = today.AddDays(1);
+
+        var todaySessions = await _uow.Sessions.ListAsync(s => s.Date >= today && s.Date < tomorrow);
+        var sessionIds = todaySessions.Select(s => s.Id).ToHashSet();
+        if (sessionIds.Count == 0) return new List<AttendanceRosterEntryDto>();
+
+        var records = await _uow.Attendance.ListAsync(r => sessionIds.Contains(r.SessionId));
+        if (records.Count == 0) return new List<AttendanceRosterEntryDto>();
+
+        var participantIds = records.Select(r => r.ParticipantId).ToHashSet();
+        var participants = (await _uow.Participants.ListAsync(p => participantIds.Contains(p.Id)))
+            .ToDictionary(p => p.Id);
+        var programs = (await _uow.Programs.GetAllAsync()).ToDictionary(p => p.Id);
+
+        return records
+            .Where(r => participants.ContainsKey(r.ParticipantId))
+            .Select(r =>
+            {
+                var p = participants[r.ParticipantId];
+                var prog = programs.GetValueOrDefault(p.ProgramId);
+                return new AttendanceRosterEntryDto
+                {
+                    RecordId = r.Id,
+                    ParticipantId = p.Id,
+                    FullName = p.FullName,
+                    Initials = p.Initials,
+                    ProgramId = p.ProgramId,
+                    ProgramSlug = prog?.Slug ?? string.Empty,
+                    ProgramName = prog?.Name ?? string.Empty,
+                    Status = r.Status,
+                    Notes = new(),
+                };
+            })
+            .OrderBy(e => e.ProgramName)
+            .ThenBy(e => e.FullName)
+            .ToList();
+    }
+
     public async Task<AttendanceNoteDto?> AddNoteAsync(Guid recordId, CreateAttendanceNoteDto dto)
     {
         var record = await _uow.Attendance.GetByIdAsync(recordId);

@@ -35,6 +35,13 @@ public interface IAttendanceService
     /// </summary>
     Task<bool> SubmitSessionAsync(Guid userId, Guid sessionId);
 
+    /// <summary>
+    /// Today's roster from existing sessions/records only — no lazy creation, no writes.
+    /// Returns an empty list if no session exists for today. Intended for read-only views
+    /// like the dashboard.
+    /// </summary>
+    Task<IReadOnlyList<AttendanceRosterEntryDto>> GetTodayRosterReadOnlyAsync();
+
     /// <summary>Adds a note to an attendance record. Returns null if the record is not found.</summary>
     Task<AttendanceNoteDto?> AddNoteAsync(Guid recordId, CreateAttendanceNoteDto dto);
 }

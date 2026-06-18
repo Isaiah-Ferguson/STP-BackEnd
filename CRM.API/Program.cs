@@ -138,6 +138,21 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Pre-warm the connection pool so the first user request doesn't pay the cold cost of
+// establishing physical connections to Azure SQL (TLS + Active Directory token acquisition).
+// Opens a few connections concurrently — each forces a distinct pooled connection — and is
+// best-effort so a transient DB hiccup at startup never blocks boot.
+try
+{
+    await Task.WhenAll(Enumerable.Range(0, 3).Select(async _ =>
+    {
+        using var warmScope = app.Services.CreateScope();
+        var warmDb = warmScope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await warmDb.Database.ExecuteSqlRawAsync("SELECT 1");
+    }));
+}
+catch { /* warm-up is best-effort */ }
+
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors("FrontendPolicy");
