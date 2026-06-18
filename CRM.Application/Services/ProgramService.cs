@@ -41,6 +41,9 @@ public class ProgramService : IProgramService
                 ColorHex = p.ColorHex,
                 SessionSchedule = p.SessionSchedule,
                 DefaultLocation = p.DefaultLocation,
+                MeetingDays = p.MeetingDays,
+                StartTime = p.StartTime,
+                EndTime = p.EndTime,
                 EnrolledCount = pts.Count(x => x.Status == Domain.Enums.ParticipantStatus.Active),
                 AttendancePct = pts.Any() ? (int)pts.Average(x => x.AttendancePct) : null,
                 NextSessionDate = next?.Date.ToString("MMM d"),
@@ -136,6 +139,9 @@ public class ProgramService : IProgramService
             ColorHex = dto.ColorHex,
             SessionSchedule = dto.SessionSchedule,
             DefaultLocation = dto.DefaultLocation,
+            MeetingDays = dto.MeetingDays,
+            StartTime = dto.StartTime,
+            EndTime = dto.EndTime,
         };
 
         await _uow.Programs.AddAsync(program);
@@ -149,8 +155,32 @@ public class ProgramService : IProgramService
             ColorHex = program.ColorHex,
             SessionSchedule = program.SessionSchedule,
             DefaultLocation = program.DefaultLocation,
+            MeetingDays = program.MeetingDays,
+            StartTime = program.StartTime,
+            EndTime = program.EndTime,
             EnrolledCount = 0,
             AlertCount = 0,
         };
+    }
+
+    public async Task<ProgramSummaryDto?> UpdateAsync(Guid id, UpdateProgramDto dto)
+    {
+        var program = await _uow.Programs.GetByIdAsync(id);
+        if (program is null) return null;
+
+        // Slug stays fixed (it backs routes/links); everything else is replaceable.
+        program.Name = dto.Name.Trim();
+        program.ColorHex = dto.ColorHex;
+        program.SessionSchedule = dto.SessionSchedule;
+        program.DefaultLocation = dto.DefaultLocation;
+        program.MeetingDays = dto.MeetingDays;
+        program.StartTime = dto.StartTime;
+        program.EndTime = dto.EndTime;
+
+        await _uow.Programs.UpdateAsync(program);
+        await _uow.SaveChangesAsync();
+
+        // Reuse the full summary computation (enrolled/attendance/next session).
+        return await GetBySlugAsync(program.Slug);
     }
 }

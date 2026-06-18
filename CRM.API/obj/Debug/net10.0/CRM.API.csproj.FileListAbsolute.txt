@@ -488,3 +488,12 @@ C:/Users/Ifergusonlll.DPJPA/Desktop/Repo/ShootingStarProject/STP-BackEnd/CRM.API
 C:/Users/Ifergusonlll.DPJPA/Desktop/Repo/ShootingStarProject/STP-BackEnd/CRM.API/obj/Debug/net10.0/ref/CRM.API.dll
 C:/Users/Ifergusonlll.DPJPA/Desktop/Repo/ShootingStarProject/STP-BackEnd/CRM.API/bin/Debug/net10.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
 >>>>>>> bc04c7d3f43726db235f1682a1e44619053893a8
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\bin\Debug\net10.0\appsettings.Development.json
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\bin\Debug\net10.0\appsettings.json
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\bin\Debug\net10.0\CRM.API.staticwebassets.endpoints.json
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\bin\Debug\net10.0\CRM.API.deps.json
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\bin\Debug\net10.0\CRM.API.runtimeconfig.json
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\bin\Debug\net10.0\CRM.API.pdb
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\obj\Debug\net10.0\CRM.API.csproj.Up2Date
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\obj\Debug\net10.0\CRM.API.genruntimeconfig.cache
+C:\Users\Ifergusonlll.DPJPA\Desktop\Repo\ShootingStarProject\STP-BackEnd\CRM.API\obj\Debug\net10.0\ref\CRM.API.dll

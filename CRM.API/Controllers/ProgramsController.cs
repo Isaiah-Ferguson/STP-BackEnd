@@ -38,4 +38,11 @@ public class ProgramsController : ControllerBase
         var result = await _service.CreateAsync(dto);
         return CreatedAtAction(nameof(GetBySlug), new { slug = result.Slug }, result);
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ProgramSummaryDto>> Update(Guid id, [FromBody] UpdateProgramDto dto)
+    {
+        var result = await _service.UpdateAsync(id, dto);
+        return result is null ? NotFound() : Ok(result);
+    }
 }
