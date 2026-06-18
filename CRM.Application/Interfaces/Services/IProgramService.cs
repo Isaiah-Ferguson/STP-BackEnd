@@ -8,4 +8,7 @@ public interface IProgramService
     Task<ProgramSummaryDto?> GetBySlugAsync(string slug);
     Task<ProgramDetailDto?> GetDetailAsync(string slug);
     Task<ProgramSummaryDto> CreateAsync(CreateProgramDto dto);
+
+    /// <summary>Updates a program's editable fields by id (slug is immutable). Returns null if not found.</summary>
+    Task<ProgramSummaryDto?> UpdateAsync(Guid id, UpdateProgramDto dto);
 }

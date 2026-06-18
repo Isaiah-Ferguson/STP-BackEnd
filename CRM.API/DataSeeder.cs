@@ -9,23 +9,55 @@ namespace CRM.API;
 public static class DataSeeder
 {
     /// <summary>
-    /// Seeds a default admin login for local development if no users exist.
-    /// Credentials: admin@shiningstars.org / ChangeMe!123
+    /// Seeds local-development logins (all with password <c>ChangeMe!123</c>):
+    /// an admin account, plus teacher accounts linked to their staff records so the
+    /// per-teacher program scoping on the attendance page can be exercised.
+    /// Each account is created only if its email doesn't already exist.
     /// </summary>
     public static async Task SeedAdminUserAsync(AppDbContext db, IPasswordHasher hasher)
     {
-        if (await db.Users.AnyAsync()) return;
-
-        var (hash, salt) = hasher.HashPassword("ChangeMe!123");
-        db.Users.Add(new User
+        // Admin login — not linked to a staff record (admins need not be staff).
+        if (!await db.Users.AnyAsync(u => u.Email == "admin@shiningstars.org"))
         {
-            Email = "admin@shiningstars.org",
-            FullName = "Site Administrator",
-            PasswordHash = hash,
-            PasswordSalt = salt,
-            Role = UserRole.Admin,
-            IsActive = true,
-        });
+            var (hash, salt) = hasher.HashPassword("ChangeMe!123");
+            db.Users.Add(new User
+            {
+                Email = "admin@shiningstars.org",
+                FullName = "Site Administrator",
+                PasswordHash = hash,
+                PasswordSalt = salt,
+                Role = UserRole.Admin,
+                IsActive = true,
+            });
+            await db.SaveChangesAsync();
+        }
+
+        // Teacher logins linked to staff. Devon teaches MJC + Manteca; Maya teaches Pathways.
+        var staffLogins = new[]
+        {
+            (Email: "devon@shiningstars.org", FullName: "Devon P.", Initials: "DP"),
+            (Email: "maya@shiningstars.org",  FullName: "Maya L.",  Initials: "ML"),
+        };
+
+        foreach (var login in staffLogins)
+        {
+            if (await db.Users.AnyAsync(u => u.Email == login.Email)) continue;
+
+            var staff = await db.Staff.FirstOrDefaultAsync(s => s.Initials == login.Initials);
+            if (staff is null) continue; // staff not seeded — skip
+
+            var (hash, salt) = hasher.HashPassword("ChangeMe!123");
+            db.Users.Add(new User
+            {
+                Email = login.Email,
+                FullName = login.FullName,
+                PasswordHash = hash,
+                PasswordSalt = salt,
+                Role = UserRole.Staff,
+                StaffMemberId = staff.Id,
+                IsActive = true,
+            });
+        }
         await db.SaveChangesAsync();
     }
 
@@ -39,16 +71,22 @@ public static class DataSeeder
         {
             Name = "MJC", Slug = "mjc", ColorHex = "#378add",
             SessionSchedule = "Mon / Wed / Fri", DefaultLocation = "FH 152",
+            MeetingDays = MeetingDays.Monday | MeetingDays.Wednesday | MeetingDays.Friday,
+            StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(11, 30),
         };
         var pathways = new CrmProgram
         {
             Name = "Pathways", Slug = "pathways", ColorHex = "#1d9e75",
             SessionSchedule = "Tue / Thu", DefaultLocation = "Room C",
+            MeetingDays = MeetingDays.Tuesday | MeetingDays.Thursday,
+            StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(12, 30),
         };
         var manteca = new CrmProgram
         {
             Name = "Manteca PT", Slug = "manteca", ColorHex = "#d85a30",
             SessionSchedule = "Mon / Thu", DefaultLocation = "Gym B",
+            MeetingDays = MeetingDays.Monday | MeetingDays.Thursday,
+            StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(15, 0),
         };
         db.Programs.AddRange(mjc, pathways, manteca);
 

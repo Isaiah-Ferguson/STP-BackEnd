@@ -54,3 +54,47 @@ public class CreateAttendanceNoteDto
     public string Content { get; set; } = string.Empty;
     public string NoteType { get; set; } = "observation";
 }
+
+/// <summary>
+/// A card on the attendance landing page: one program meeting on a given date,
+/// scoped to the current user's programs. <see cref="SessionId"/> is null until
+/// the session is started.
+/// </summary>
+public class ScheduledSessionDto
+{
+    public Guid? SessionId { get; set; }
+    public Guid ProgramId { get; set; }
+    public string ProgramSlug { get; set; } = string.Empty;
+    public string ProgramName { get; set; } = string.Empty;
+    public string ColorHex { get; set; } = string.Empty;
+    public string Date { get; set; } = string.Empty;
+    public string? TimeRange { get; set; }
+    public string? Room { get; set; }
+
+    /// <summary>"not-started", "in-progress", or "submitted".</summary>
+    public string Status { get; set; } = "not-started";
+    public int MarkedCount { get; set; }
+    public int TotalCount { get; set; }
+
+    /// <summary>True when this session exists on a date the program isn't normally scheduled.</summary>
+    public bool IsAdHoc { get; set; }
+}
+
+/// <summary>A single session's roster plus its meta — the working view for taking attendance.</summary>
+public class SessionRosterDto
+{
+    public Guid SessionId { get; set; }
+    public Guid ProgramId { get; set; }
+    public string ProgramSlug { get; set; } = string.Empty;
+    public string ProgramName { get; set; } = string.Empty;
+    public string ColorHex { get; set; } = string.Empty;
+    public string Date { get; set; } = string.Empty;
+    public string? TimeRange { get; set; }
+    public string? Room { get; set; }
+
+    /// <summary>"open" or "submitted".</summary>
+    public string Status { get; set; } = "open";
+    public DateTime? SubmittedAt { get; set; }
+
+    public List<AttendanceRosterEntryDto> Entries { get; set; } = new();
+}
