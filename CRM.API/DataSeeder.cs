@@ -208,4 +208,82 @@ public static class DataSeeder
 
         await db.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Seeds sample attendance for TODAY so the attendance page and dashboard show realistic
+    /// activity: a session per program with most participants marked Present (every 4th Absent)
+    /// and a couple of notes. Idempotent — skips entirely once any attendance note exists.
+    /// </summary>
+    public static async Task SeedSampleAttendanceAsync(AppDbContext db)
+    {
+        if (await db.AttendanceNotes.AnyAsync()) return;
+
+        var today = DateTime.UtcNow.Date;
+        var tomorrow = today.AddDays(1);
+        var programs = await db.Programs.ToListAsync();
+
+        foreach (var program in programs)
+        {
+            var active = await db.Participants
+                .Where(p => p.ProgramId == program.Id && p.Status == ParticipantStatus.Active)
+                .ToListAsync();
+            if (active.Count == 0) continue;
+
+            // Get-or-create today's session for this program.
+            var session = await db.Sessions
+                .FirstOrDefaultAsync(s => s.ProgramId == program.Id && s.Date >= today && s.Date < tomorrow);
+            if (session is null)
+            {
+                session = new Session
+                {
+                    ProgramId = program.Id,
+                    Date = today,
+                    Room = program.DefaultLocation,
+                    TimeRange = program.StartTime is { } st && program.EndTime is { } et
+                        ? $"{st:h:mm tt}–{et:h:mm tt}"
+                        : null,
+                    Status = SessionStatus.Open,
+                };
+                db.Sessions.Add(session);
+                await db.SaveChangesAsync();
+            }
+
+            // Ensure a record per active participant.
+            var existing = (await db.AttendanceRecords.Where(r => r.SessionId == session.Id).ToListAsync())
+                .ToDictionary(r => r.ParticipantId);
+            var records = new List<AttendanceRecord>();
+            foreach (var p in active)
+            {
+                if (!existing.TryGetValue(p.Id, out var rec))
+                {
+                    rec = new AttendanceRecord { ParticipantId = p.Id, SessionId = session.Id, Status = AttendanceStatus.Unmarked };
+                    db.AttendanceRecords.Add(rec);
+                }
+                records.Add(rec);
+            }
+            await db.SaveChangesAsync();
+
+            // Mark a realistic spread: every 4th Absent, the rest Present.
+            for (var i = 0; i < records.Count; i++)
+                records[i].Status = (i % 4 == 3) ? AttendanceStatus.Absent : AttendanceStatus.Present;
+
+            // A couple of sample notes on the first participants.
+            if (records.Count > 0)
+                db.AttendanceNotes.Add(new AttendanceNote
+                {
+                    AttendanceRecordId = records[0].Id,
+                    Content = $"Great energy in {program.Name} warm-ups today.",
+                    NoteType = "observation",
+                });
+            if (records.Count > 1)
+                db.AttendanceNotes.Add(new AttendanceNote
+                {
+                    AttendanceRecordId = records[1].Id,
+                    Content = "Arrived late — follow up with family about transportation.",
+                    NoteType = "concern",
+                });
+
+            await db.SaveChangesAsync();
+        }
+    }
 }
