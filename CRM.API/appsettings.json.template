@@ -7,7 +7,7 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "DefaultConnection": "Server=tcp:ssptestserver.database.windows.net,1433;Initial Catalog=sstestdb;Persist Security Info=False;User ID=isaiah;Password=Ferguson123!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    "DefaultConnection": "Server=tcp:<server>.database.windows.net,1433;Initial Catalog=<database>;User ID=<user>;Password=<password>;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   },
   "Cors": {
     "AllowedOrigins": [
@@ -16,7 +16,7 @@
     ]
   },
   "Jwt": {
-    "Key": "",
+    "Key": "<32+ character signing secret — set via the Jwt__Key env var / Azure app setting, never commit a real value>",
     "Issuer": "ShinyStarCRM",
     "Audience": "ShinyStarCRM",
     "ExpiryMinutes": 480
