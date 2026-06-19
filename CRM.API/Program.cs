@@ -130,13 +130,10 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
-    if (app.Environment.IsDevelopment())
-    {
-        var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-        await DataSeeder.SeedAsync(db);
-        await DataSeeder.SeedAdminUserAsync(db, hasher);
-        await DataSeeder.SeedSampleAttendanceAsync(db);
-    }
+    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+    await DataSeeder.SeedAsync(db);
+    await DataSeeder.SeedAdminUserAsync(db, hasher);
+    await DataSeeder.SeedSampleAttendanceAsync(db);
 }
 
 app.UseExceptionHandler();
