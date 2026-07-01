@@ -14,6 +14,8 @@ public class UnitOfWork : IUnitOfWork
         Participants = new GenericRepository<Participant>(db);
         Staff = new GenericRepository<StaffMember>(db);
         Programs = new GenericRepository<CrmProgram>(db);
+        ObjectiveAreas = new GenericRepository<ObjectiveArea>(db);
+        SubSkills = new GenericRepository<SubSkill>(db);
         Attendance = new GenericRepository<AttendanceRecord>(db);
         AttendanceNotes = new GenericRepository<AttendanceNote>(db);
         Sessions = new GenericRepository<Session>(db);
@@ -28,6 +30,8 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<Participant> Participants { get; }
     public IRepository<StaffMember> Staff { get; }
     public IRepository<CrmProgram> Programs { get; }
+    public IRepository<ObjectiveArea> ObjectiveAreas { get; }
+    public IRepository<SubSkill> SubSkills { get; }
     public IRepository<AttendanceRecord> Attendance { get; }
     public IRepository<AttendanceNote> AttendanceNotes { get; }
     public IRepository<Session> Sessions { get; }

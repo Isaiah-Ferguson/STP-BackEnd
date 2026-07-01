@@ -8,6 +8,8 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<CrmProgram> Programs { get; set; }
+    public DbSet<ObjectiveArea> ObjectiveAreas { get; set; }
+    public DbSet<SubSkill> SubSkills { get; set; }
     public DbSet<Participant> Participants { get; set; }
     public DbSet<StaffMember> Staff { get; set; }
     public DbSet<StaffProgramAssignment> StaffProgramAssignments { get; set; }
