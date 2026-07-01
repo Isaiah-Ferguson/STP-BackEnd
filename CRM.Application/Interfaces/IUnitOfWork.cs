@@ -7,6 +7,8 @@ public interface IUnitOfWork : IDisposable
     IRepository<Participant> Participants { get; }
     IRepository<StaffMember> Staff { get; }
     IRepository<CrmProgram> Programs { get; }
+    IRepository<ObjectiveArea> ObjectiveAreas { get; }
+    IRepository<SubSkill> SubSkills { get; }
     IRepository<AttendanceRecord> Attendance { get; }
     IRepository<AttendanceNote> AttendanceNotes { get; }
     IRepository<Session> Sessions { get; }

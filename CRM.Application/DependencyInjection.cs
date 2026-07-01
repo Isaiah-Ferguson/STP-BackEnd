@@ -8,6 +8,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        services.AddScoped<ITaxonomyService, TaxonomyService>();
         services.AddScoped<IProgramService, ProgramService>();
         services.AddScoped<IParticipantService, ParticipantService>();
         services.AddScoped<IStaffService, StaffService>();
@@ -17,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<ICalendarService, CalendarService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IReportsService, ReportsService>();
 
         return services;
     }
