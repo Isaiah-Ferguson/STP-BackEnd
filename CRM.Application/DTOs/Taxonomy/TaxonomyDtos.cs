@@ -23,14 +23,32 @@ public class SubSkillDto
     public string? ObjectiveAreaColorHex { get; set; }
 }
 
+public class SiteDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
+    public int SortOrder { get; set; }
+}
+
+public class StarGroupDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
+    public int SortOrder { get; set; }
+}
+
 /// <summary>
 /// The reference dropdown sources mirrored from the spreadsheets' "Do Not Remove-
-/// Lists" tabs: the objective areas (with their nested sub-skills) and the progress
-/// levels. Extended in later phases with staff, sites, and star groups.
+/// Lists" tabs: objective areas (with nested sub-skills), progress levels, sites, and
+/// star groups. Grows further with staff in later phases.
 /// </summary>
 public class ReferenceListsDto
 {
     public List<ObjectiveAreaDto> ObjectiveAreas { get; set; } = new();
     public List<SubSkillDto> SubSkills { get; set; } = new();
     public List<string> ProgressLevels { get; set; } = new();
+    public List<SiteDto> Sites { get; set; } = new();
+    public List<StarGroupDto> StarGroups { get; set; } = new();
 }

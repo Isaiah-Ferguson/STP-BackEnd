@@ -11,8 +11,13 @@ namespace CRM.API.Controllers;
 public class ParticipantsController : ControllerBase
 {
     private readonly IParticipantService _service;
+    private readonly IArtsProfileService _artsProfile;
 
-    public ParticipantsController(IParticipantService service) => _service = service;
+    public ParticipantsController(IParticipantService service, IArtsProfileService artsProfile)
+    {
+        _service = service;
+        _artsProfile = artsProfile;
+    }
 
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ParticipantSummaryDto>>> GetAll() =>
@@ -44,5 +49,20 @@ public class ParticipantsController : ControllerBase
     {
         var deleted = await _service.DeleteAsync(id);
         return deleted ? NoContent() : NotFound();
+    }
+
+    /// <summary>The participant's Student Frame (IPP summary, current level, TSSP arts goal).</summary>
+    [HttpGet("{id:guid}/arts-profile")]
+    public async Task<ActionResult<ParticipantArtsProfileDto>> GetArtsProfile(Guid id)
+    {
+        var profile = await _artsProfile.GetAsync(id);
+        return profile is null ? NotFound() : Ok(profile);
+    }
+
+    [HttpPut("{id:guid}/arts-profile")]
+    public async Task<ActionResult<ParticipantArtsProfileDto>> UpsertArtsProfile(Guid id, [FromBody] UpsertArtsProfileDto dto)
+    {
+        var profile = await _artsProfile.UpsertAsync(id, dto);
+        return profile is null ? NotFound() : Ok(profile);
     }
 }

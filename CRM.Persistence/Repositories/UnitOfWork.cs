@@ -16,6 +16,16 @@ public class UnitOfWork : IUnitOfWork
         Programs = new GenericRepository<CrmProgram>(db);
         ObjectiveAreas = new GenericRepository<ObjectiveArea>(db);
         SubSkills = new GenericRepository<SubSkill>(db);
+        Games = new GenericRepository<Game>(db);
+        GameSubGoals = new GenericRepository<GameSubGoal>(db);
+        Sites = new GenericRepository<Site>(db);
+        StarGroups = new GenericRepository<StarGroup>(db);
+        RosterAssignments = new GenericRepository<RosterAssignment>(db);
+        ParticipantArtsProfiles = new GenericRepository<ParticipantArtsProfile>(db);
+        WeeklyDataEntries = new GenericRepository<WeeklyDataEntry>(db);
+        MonthlyProgressSnapshots = new GenericRepository<MonthlyProgressSnapshot>(db);
+        WeeklyFocusSkills = new GenericRepository<WeeklyFocusSkill>(db);
+        ScoreThresholds = new GenericRepository<ScoreThreshold>(db);
         Attendance = new GenericRepository<AttendanceRecord>(db);
         AttendanceNotes = new GenericRepository<AttendanceNote>(db);
         Sessions = new GenericRepository<Session>(db);
@@ -32,6 +42,16 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<CrmProgram> Programs { get; }
     public IRepository<ObjectiveArea> ObjectiveAreas { get; }
     public IRepository<SubSkill> SubSkills { get; }
+    public IRepository<Game> Games { get; }
+    public IRepository<GameSubGoal> GameSubGoals { get; }
+    public IRepository<Site> Sites { get; }
+    public IRepository<StarGroup> StarGroups { get; }
+    public IRepository<RosterAssignment> RosterAssignments { get; }
+    public IRepository<ParticipantArtsProfile> ParticipantArtsProfiles { get; }
+    public IRepository<WeeklyDataEntry> WeeklyDataEntries { get; }
+    public IRepository<MonthlyProgressSnapshot> MonthlyProgressSnapshots { get; }
+    public IRepository<WeeklyFocusSkill> WeeklyFocusSkills { get; }
+    public IRepository<ScoreThreshold> ScoreThresholds { get; }
     public IRepository<AttendanceRecord> Attendance { get; }
     public IRepository<AttendanceNote> AttendanceNotes { get; }
     public IRepository<Session> Sessions { get; }

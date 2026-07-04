@@ -51,6 +51,8 @@ public class TaxonomyService : ITaxonomyService
     public async Task<ReferenceListsDto> GetListsAsync()
     {
         var areas = await GetObjectiveAreasAsync();
+        var sites = await _uow.Sites.GetAllAsync();
+        var groups = await _uow.StarGroups.GetAllAsync();
         return new ReferenceListsDto
         {
             ObjectiveAreas = areas.ToList(),
@@ -58,6 +60,12 @@ public class TaxonomyService : ITaxonomyService
                              .OrderBy(s => s.SectionNumber).ThenBy(s => s.SortOrder)
                              .ToList(),
             ProgressLevels = Enum.GetNames<ProgressLevel>().ToList(),
+            Sites = sites.OrderBy(s => s.SortOrder)
+                         .Select(s => new SiteDto { Id = s.Id, Name = s.Name, Slug = s.Slug, SortOrder = s.SortOrder })
+                         .ToList(),
+            StarGroups = groups.OrderBy(g => g.SortOrder)
+                               .Select(g => new StarGroupDto { Id = g.Id, Name = g.Name, Slug = g.Slug, SortOrder = g.SortOrder })
+                               .ToList(),
         };
     }
 

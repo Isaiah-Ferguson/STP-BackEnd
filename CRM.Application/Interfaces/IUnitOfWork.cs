@@ -9,6 +9,16 @@ public interface IUnitOfWork : IDisposable
     IRepository<CrmProgram> Programs { get; }
     IRepository<ObjectiveArea> ObjectiveAreas { get; }
     IRepository<SubSkill> SubSkills { get; }
+    IRepository<Game> Games { get; }
+    IRepository<GameSubGoal> GameSubGoals { get; }
+    IRepository<Site> Sites { get; }
+    IRepository<StarGroup> StarGroups { get; }
+    IRepository<RosterAssignment> RosterAssignments { get; }
+    IRepository<ParticipantArtsProfile> ParticipantArtsProfiles { get; }
+    IRepository<WeeklyDataEntry> WeeklyDataEntries { get; }
+    IRepository<MonthlyProgressSnapshot> MonthlyProgressSnapshots { get; }
+    IRepository<WeeklyFocusSkill> WeeklyFocusSkills { get; }
+    IRepository<ScoreThreshold> ScoreThresholds { get; }
     IRepository<AttendanceRecord> Attendance { get; }
     IRepository<AttendanceNote> AttendanceNotes { get; }
     IRepository<Session> Sessions { get; }

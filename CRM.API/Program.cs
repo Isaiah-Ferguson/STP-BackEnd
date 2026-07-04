@@ -132,6 +132,7 @@ using (var scope = app.Services.CreateScope())
 
     var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
     await DataSeeder.SeedAsync(db);
+    await DataSeeder.SeedGamesLibraryAsync(db);
     await DataSeeder.SeedAdminUserAsync(db, hasher);
     await DataSeeder.SeedSampleAttendanceAsync(db);
 }

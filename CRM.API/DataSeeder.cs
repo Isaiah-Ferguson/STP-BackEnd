@@ -286,4 +286,53 @@ public static class DataSeeder
             await db.SaveChangesAsync();
         }
     }
+
+    /// <summary>
+    /// Seeds the Games Library (~57 games from the Annual Programming Calendar), tagging each
+    /// to the shared taxonomy by slug. Idempotent — skips entirely once any game exists. The
+    /// taxonomy (ObjectiveAreas + SubSkills) is seeded by the AddSkillsTaxonomy migration, so it
+    /// is present by the time this runs; if it somehow isn't, this no-ops rather than crashing.
+    /// </summary>
+    public static async Task SeedGamesLibraryAsync(AppDbContext db)
+    {
+        if (await db.Games.AnyAsync()) return;
+
+        var areaBySlug = await db.ObjectiveAreas.ToDictionaryAsync(a => a.Slug, a => a.Id);
+        var subBySlug = await db.SubSkills.ToDictionaryAsync(s => s.Slug, s => s.Id);
+        if (areaBySlug.Count == 0 || subBySlug.Count == 0) return; // taxonomy not seeded yet
+
+        foreach (var row in GameSeedData.Games)
+        {
+            if (!areaBySlug.TryGetValue(row.AreaSlug, out var areaId)) continue;
+
+            var game = new Game
+            {
+                Name = row.Name,
+                Source = row.Source,
+                Category = row.Category,
+                CategoryLabel = row.CategoryLabel,
+                Tiers = row.Tiers,
+                PrimaryObjectiveAreaId = areaId,
+                Description = row.Description,
+                BestForVariations = row.BestFor,
+                WhenToUse = row.WhenToUse,
+            };
+            db.Games.Add(game);
+
+            var order = 0;
+            foreach (var (slug, isPrimary) in row.SubGoals)
+            {
+                if (!subBySlug.TryGetValue(slug, out var subId)) continue;
+                db.GameSubGoals.Add(new GameSubGoal
+                {
+                    GameId = game.Id,
+                    SubSkillId = subId,
+                    IsPrimary = isPrimary,
+                    SortOrder = order++,
+                });
+            }
+        }
+
+        await db.SaveChangesAsync();
+    }
 }

@@ -4,6 +4,7 @@ using CRM.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CRM.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260703182053_AddParticipantArtsProfile")]
+    partial class AddParticipantArtsProfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -304,61 +307,6 @@ namespace CRM.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("GameSubGoals");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.MonthlyProgressSnapshot", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ConfirmedByStaffMemberId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MonthKey")
-                        .IsRequired()
-                        .HasMaxLength(7)
-                        .HasColumnType("nvarchar(7)");
-
-                    b.Property<Guid>("ParticipantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ScoredWeekCount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SubSkillId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("SuggestedLevel")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SummedScore")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConfirmedByStaffMemberId");
-
-                    b.HasIndex("SubSkillId");
-
-                    b.HasIndex("MonthKey", "SubSkillId");
-
-                    b.HasIndex("ParticipantId", "SubSkillId", "MonthKey")
-                        .IsUnique();
-
-                    b.ToTable("MonthlyProgressSnapshots");
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.ObjectiveArea", b =>
@@ -659,32 +607,6 @@ namespace CRM.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("RosterAssignments");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.ScoreThreshold", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<double>("MinAverage")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Level")
-                        .IsUnique();
-
-                    b.ToTable("ScoreThresholds");
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.Script", b =>
@@ -1011,95 +933,6 @@ namespace CRM.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CRM.Domain.Entities.WeeklyDataEntry", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MonthKey")
-                        .IsRequired()
-                        .HasMaxLength(7)
-                        .HasColumnType("nvarchar(7)");
-
-                    b.Property<Guid>("ParticipantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("RecordedByStaffMemberId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("SessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SubSkillId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("WeekDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("WeekNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecordedByStaffMemberId");
-
-                    b.HasIndex("SessionId");
-
-                    b.HasIndex("SubSkillId");
-
-                    b.HasIndex("ParticipantId", "MonthKey");
-
-                    b.HasIndex("ParticipantId", "SubSkillId", "MonthKey", "WeekNumber");
-
-                    b.ToTable("WeeklyDataEntries");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.WeeklyFocusSkill", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MonthKey")
-                        .IsRequired()
-                        .HasMaxLength(7)
-                        .HasColumnType("nvarchar(7)");
-
-                    b.Property<Guid>("ProgramId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SubSkillId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("WeekNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubSkillId");
-
-                    b.HasIndex("ProgramId", "MonthKey", "WeekNumber", "SubSkillId")
-                        .IsUnique();
-
-                    b.ToTable("WeeklyFocusSkills");
-                });
-
             modelBuilder.Entity("CRM.Domain.Entities.AttendanceNote", b =>
                 {
                     b.HasOne("CRM.Domain.Entities.AttendanceRecord", "AttendanceRecord")
@@ -1177,30 +1010,6 @@ namespace CRM.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Game");
-
-                    b.Navigation("SubSkill");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.MonthlyProgressSnapshot", b =>
-                {
-                    b.HasOne("CRM.Domain.Entities.StaffMember", null)
-                        .WithMany()
-                        .HasForeignKey("ConfirmedByStaffMemberId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("CRM.Domain.Entities.Participant", "Participant")
-                        .WithMany()
-                        .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CRM.Domain.Entities.SubSkill", "SubSkill")
-                        .WithMany()
-                        .HasForeignKey("SubSkillId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Participant");
 
                     b.Navigation("SubSkill");
                 });
@@ -1356,54 +1165,6 @@ namespace CRM.Persistence.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("StaffMember");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.WeeklyDataEntry", b =>
-                {
-                    b.HasOne("CRM.Domain.Entities.Participant", "Participant")
-                        .WithMany()
-                        .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CRM.Domain.Entities.StaffMember", null)
-                        .WithMany()
-                        .HasForeignKey("RecordedByStaffMemberId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("CRM.Domain.Entities.Session", null)
-                        .WithMany()
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("CRM.Domain.Entities.SubSkill", "SubSkill")
-                        .WithMany()
-                        .HasForeignKey("SubSkillId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Participant");
-
-                    b.Navigation("SubSkill");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.WeeklyFocusSkill", b =>
-                {
-                    b.HasOne("CRM.Domain.Entities.CrmProgram", "Program")
-                        .WithMany()
-                        .HasForeignKey("ProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CRM.Domain.Entities.SubSkill", "SubSkill")
-                        .WithMany()
-                        .HasForeignKey("SubSkillId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Program");
-
-                    b.Navigation("SubSkill");
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.AttendanceRecord", b =>

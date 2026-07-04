@@ -10,6 +10,16 @@ public class AppDbContext : DbContext
     public DbSet<CrmProgram> Programs { get; set; }
     public DbSet<ObjectiveArea> ObjectiveAreas { get; set; }
     public DbSet<SubSkill> SubSkills { get; set; }
+    public DbSet<Game> Games { get; set; }
+    public DbSet<GameSubGoal> GameSubGoals { get; set; }
+    public DbSet<Site> Sites { get; set; }
+    public DbSet<StarGroup> StarGroups { get; set; }
+    public DbSet<RosterAssignment> RosterAssignments { get; set; }
+    public DbSet<ParticipantArtsProfile> ParticipantArtsProfiles { get; set; }
+    public DbSet<WeeklyDataEntry> WeeklyDataEntries { get; set; }
+    public DbSet<MonthlyProgressSnapshot> MonthlyProgressSnapshots { get; set; }
+    public DbSet<WeeklyFocusSkill> WeeklyFocusSkills { get; set; }
+    public DbSet<ScoreThreshold> ScoreThresholds { get; set; }
     public DbSet<Participant> Participants { get; set; }
     public DbSet<StaffMember> Staff { get; set; }
     public DbSet<StaffProgramAssignment> StaffProgramAssignments { get; set; }

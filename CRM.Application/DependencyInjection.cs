@@ -9,8 +9,12 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<ITaxonomyService, TaxonomyService>();
+        services.AddScoped<IGameService, GameService>();
+        services.AddScoped<IRosterService, RosterService>();
+        services.AddScoped<IProgressTrackingService, ProgressTrackingService>();
         services.AddScoped<IProgramService, ProgramService>();
         services.AddScoped<IParticipantService, ParticipantService>();
+        services.AddScoped<IArtsProfileService, ArtsProfileService>();
         services.AddScoped<IStaffService, StaffService>();
         services.AddScoped<IAttendanceService, AttendanceService>();
         services.AddScoped<ITaskService, TaskService>();
