@@ -35,6 +35,16 @@ var jwtKey = jwtSection["Key"];
 if (string.IsNullOrWhiteSpace(jwtKey))
     throw new InvalidOperationException("Missing configuration: Jwt:Key — set the Jwt__Key environment variable in Azure App Service.");
 
+// Outside Development, refuse to run on the publicly-known placeholder key (it was
+// committed to the repo, so anyone who has seen it could forge tokens) or on any
+// key too short for HS256.
+const string DevPlaceholderJwtKey = "dev-only-super-secret-signing-key-change-me-32+chars";
+if (!builder.Environment.IsDevelopment()
+    && (jwtKey == DevPlaceholderJwtKey || Encoding.UTF8.GetByteCount(jwtKey) < 32))
+    throw new InvalidOperationException(
+        "Refusing to start: Jwt:Key is the development placeholder or shorter than 32 bytes. "
+        + "Set Jwt__Key to a long random secret (e.g. 'openssl rand -base64 48') in Azure App Service.");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
