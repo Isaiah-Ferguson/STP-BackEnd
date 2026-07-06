@@ -21,4 +21,10 @@ public interface IProgressTrackingService
 
     /// <summary>Confirms (or overrides) a Star's month-end level for one sub-skill. Null if the participant doesn't exist.</summary>
     Task<MonthlyProgressSnapshotDto?> ConfirmMonthEndAsync(Guid participantId, string monthKey, ConfirmMonthEndDto dto);
+
+    /// <summary>Records (upserts) a Section-6 note for a Star in one week. Null if the participant doesn't exist.</summary>
+    Task<WeeklyNoteSelectionDto?> UpsertNoteSelectionAsync(Guid participantId, string monthKey, UpsertNoteSelectionDto dto);
+
+    /// <summary>Creates or updates a Star's monthly summary. Null if the participant doesn't exist.</summary>
+    Task<MonthlySummaryDto?> UpsertMonthlySummaryAsync(Guid participantId, string monthKey, UpsertMonthlySummaryDto dto);
 }

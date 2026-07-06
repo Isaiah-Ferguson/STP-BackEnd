@@ -68,11 +68,65 @@ public class SetFocusSkillsDto
     public List<Guid> SubSkillIds { get; set; } = new();
 }
 
-/// <summary>A Star's full month: every weekly entry plus the per-skill month-end snapshots.</summary>
+/// <summary>A Star's full month: weekly entries, month-end snapshots, Section-6 notes, and the monthly summary.</summary>
 public class StarMonthDto
 {
     public Guid ParticipantId { get; set; }
     public string MonthKey { get; set; } = string.Empty;
     public List<WeeklyDataEntryDto> Entries { get; set; } = new();
     public List<MonthlyProgressSnapshotDto> Snapshots { get; set; } = new();
+    public List<WeeklyNoteSelectionDto> NoteSelections { get; set; } = new();
+    public MonthlySummaryDto? MonthlySummary { get; set; }
+}
+
+// ── Goal bank + Section-6 notes + monthly summary ─────────────────────────────
+
+public class GoalBankEntryDto
+{
+    public Guid Id { get; set; }
+    public GoalBankKind Kind { get; set; }
+    public int SectionNumber { get; set; }
+    public ProgressLevel Level { get; set; }
+    public string Text { get; set; } = string.Empty;
+    public bool HasGrowingEdge { get; set; }
+}
+
+public class WeeklyNoteSelectionDto
+{
+    public Guid Id { get; set; }
+    public Guid ParticipantId { get; set; }
+    public string MonthKey { get; set; } = string.Empty;
+    public int WeekNumber { get; set; }
+    public GoalBankKind Kind { get; set; }
+    public Guid? GoalBankEntryId { get; set; }
+    public string? CustomText { get; set; }
+    /// <summary>The bank entry's text (if a bank entry was chosen), else the custom text — the display value.</summary>
+    public string? DisplayText { get; set; }
+}
+
+public class UpsertNoteSelectionDto
+{
+    public int WeekNumber { get; set; }
+    public GoalBankKind Kind { get; set; }
+    public Guid? GoalBankEntryId { get; set; }
+    public string? CustomText { get; set; }
+}
+
+public class MonthlySummaryDto
+{
+    public Guid ParticipantId { get; set; }
+    public string MonthKey { get; set; } = string.Empty;
+    public ProgressLevel PrimaryLevel { get; set; }
+    public string? ProgressNarrative { get; set; }
+    public bool GoalsCarryOver { get; set; }
+    public string? NextMonthUpdate { get; set; }
+    public bool HasSummary { get; set; }
+}
+
+public class UpsertMonthlySummaryDto
+{
+    public ProgressLevel PrimaryLevel { get; set; }
+    public string? ProgressNarrative { get; set; }
+    public bool GoalsCarryOver { get; set; } = true;
+    public string? NextMonthUpdate { get; set; }
 }

@@ -89,7 +89,10 @@ public class ProgressTrackingService : IProgressTrackingService
 
         var entries = await _uow.WeeklyDataEntries.ListAsync(e => e.ParticipantId == participantId && e.MonthKey == monthKey);
         var snaps = await _uow.MonthlyProgressSnapshots.ListAsync(s => s.ParticipantId == participantId && s.MonthKey == monthKey);
+        var notes = await _uow.WeeklyNoteSelections.ListAsync(n => n.ParticipantId == participantId && n.MonthKey == monthKey);
+        var summary = (await _uow.MonthlySummaries.ListAsync(m => m.ParticipantId == participantId && m.MonthKey == monthKey)).FirstOrDefault();
         var skills = await SubSkillMapAsync();
+        var bankText = await GoalBankTextMapAsync();
 
         return new StarMonthDto
         {
@@ -104,7 +107,78 @@ public class ProgressTrackingService : IProgressTrackingService
                 .ThenBy(s => skills.GetValueOrDefault(s.SubSkillId)?.SortOrder ?? 0)
                 .Select(s => ToSnapshotDto(s, skills))
                 .ToList(),
+            NoteSelections = notes
+                .OrderBy(n => n.WeekNumber).ThenBy(n => n.Kind)
+                .Select(n => ToNoteDto(n, bankText))
+                .ToList(),
+            MonthlySummary = summary is null ? null : ToSummaryDto(summary),
         };
+    }
+
+    public async Task<WeeklyNoteSelectionDto?> UpsertNoteSelectionAsync(Guid participantId, string monthKey, UpsertNoteSelectionDto dto)
+    {
+        if (await _uow.Participants.GetByIdAsync(participantId) is null) return null;
+
+        var note = (await _uow.WeeklyNoteSelections.ListAsync(n =>
+            n.ParticipantId == participantId && n.MonthKey == monthKey &&
+            n.WeekNumber == dto.WeekNumber && n.Kind == dto.Kind)).FirstOrDefault();
+
+        var custom = string.IsNullOrWhiteSpace(dto.CustomText) ? null : dto.CustomText.Trim();
+
+        if (note is null)
+        {
+            note = new WeeklyNoteSelection
+            {
+                ParticipantId = participantId,
+                MonthKey = monthKey,
+                WeekNumber = dto.WeekNumber,
+                Kind = dto.Kind,
+                GoalBankEntryId = dto.GoalBankEntryId,
+                CustomText = custom,
+            };
+            await _uow.WeeklyNoteSelections.AddAsync(note);
+        }
+        else
+        {
+            note.GoalBankEntryId = dto.GoalBankEntryId;
+            note.CustomText = custom;
+            await _uow.WeeklyNoteSelections.UpdateAsync(note);
+        }
+
+        await _uow.SaveChangesAsync();
+        return ToNoteDto(note, await GoalBankTextMapAsync());
+    }
+
+    public async Task<MonthlySummaryDto?> UpsertMonthlySummaryAsync(Guid participantId, string monthKey, UpsertMonthlySummaryDto dto)
+    {
+        if (await _uow.Participants.GetByIdAsync(participantId) is null) return null;
+
+        var summary = (await _uow.MonthlySummaries.ListAsync(m => m.ParticipantId == participantId && m.MonthKey == monthKey)).FirstOrDefault();
+
+        if (summary is null)
+        {
+            summary = new MonthlySummary
+            {
+                ParticipantId = participantId,
+                MonthKey = monthKey,
+                PrimaryLevel = dto.PrimaryLevel,
+                ProgressNarrative = string.IsNullOrWhiteSpace(dto.ProgressNarrative) ? null : dto.ProgressNarrative.Trim(),
+                GoalsCarryOver = dto.GoalsCarryOver,
+                NextMonthUpdate = string.IsNullOrWhiteSpace(dto.NextMonthUpdate) ? null : dto.NextMonthUpdate.Trim(),
+            };
+            await _uow.MonthlySummaries.AddAsync(summary);
+        }
+        else
+        {
+            summary.PrimaryLevel = dto.PrimaryLevel;
+            summary.ProgressNarrative = string.IsNullOrWhiteSpace(dto.ProgressNarrative) ? null : dto.ProgressNarrative.Trim();
+            summary.GoalsCarryOver = dto.GoalsCarryOver;
+            summary.NextMonthUpdate = string.IsNullOrWhiteSpace(dto.NextMonthUpdate) ? null : dto.NextMonthUpdate.Trim();
+            await _uow.MonthlySummaries.UpdateAsync(summary);
+        }
+
+        await _uow.SaveChangesAsync();
+        return ToSummaryDto(summary);
     }
 
     public async Task<IReadOnlyList<MonthlyProgressSnapshotDto>?> ComputeMonthEndAsync(Guid participantId, string monthKey)
@@ -199,6 +273,32 @@ public class ProgressTrackingService : IProgressTrackingService
 
     private async Task<Dictionary<Guid, SubSkill>> SubSkillMapAsync() =>
         (await _uow.SubSkills.GetAllAsync()).ToDictionary(s => s.Id);
+
+    private async Task<Dictionary<Guid, string>> GoalBankTextMapAsync() =>
+        (await _uow.GoalBankEntries.GetAllAsync()).ToDictionary(g => g.Id, g => g.Text);
+
+    private static WeeklyNoteSelectionDto ToNoteDto(WeeklyNoteSelection n, Dictionary<Guid, string> bankText) => new()
+    {
+        Id = n.Id,
+        ParticipantId = n.ParticipantId,
+        MonthKey = n.MonthKey,
+        WeekNumber = n.WeekNumber,
+        Kind = n.Kind,
+        GoalBankEntryId = n.GoalBankEntryId,
+        CustomText = n.CustomText,
+        DisplayText = n.GoalBankEntryId is { } id && bankText.TryGetValue(id, out var t) ? t : n.CustomText,
+    };
+
+    private static MonthlySummaryDto ToSummaryDto(MonthlySummary s) => new()
+    {
+        ParticipantId = s.ParticipantId,
+        MonthKey = s.MonthKey,
+        PrimaryLevel = s.PrimaryLevel,
+        ProgressNarrative = s.ProgressNarrative,
+        GoalsCarryOver = s.GoalsCarryOver,
+        NextMonthUpdate = s.NextMonthUpdate,
+        HasSummary = true,
+    };
 
     private static DateTime? ParseDate(string? s) =>
         DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var d) ? d : null;

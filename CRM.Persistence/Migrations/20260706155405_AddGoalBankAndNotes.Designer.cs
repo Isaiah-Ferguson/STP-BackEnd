@@ -4,6 +4,7 @@ using CRM.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CRM.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260706155405_AddGoalBankAndNotes")]
+    partial class AddGoalBankAndNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,51 +24,6 @@ namespace CRM.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CRM.Domain.Entities.AgeModification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("GameId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("GameName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("GroupAgeLevel")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Modification")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<bool>("TeacherSuggested")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("TeacherSuggestedId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GameId");
-
-                    b.HasIndex("TeacherSuggestedId");
-
-                    b.ToTable("AgeModifications");
-                });
 
             modelBuilder.Entity("CRM.Domain.Entities.AttendanceNote", b =>
                 {
@@ -176,61 +134,6 @@ namespace CRM.Persistence.Migrations
                     b.HasIndex("ProgramId");
 
                     b.ToTable("CalendarEvents");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.CalendarTheme", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AlternativeOptionsText")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FeaturedGamesText")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("KeyArtsDatesText")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("LegendArc")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Month")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductionPhase")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("ProgrammingNotes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("ThemeSubtitle")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("ThemeTitle")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Month")
-                        .IsUnique();
-
-                    b.ToTable("CalendarThemes");
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.CrmProgram", b =>
@@ -372,50 +275,6 @@ namespace CRM.Persistence.Migrations
                     b.ToTable("Games");
                 });
 
-            modelBuilder.Entity("CRM.Domain.Entities.GameIdea", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<Guid?>("PromotedGameId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SourceInspiration")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("StatusNotes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int?>("TargetCategory")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("TeacherSuggested")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("TeacherSuggestedId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TeacherSuggestedId");
-
-                    b.ToTable("GameIdeas");
-                });
-
             modelBuilder.Entity("CRM.Domain.Entities.GameSubGoal", b =>
                 {
                     b.Property<Guid>("Id")
@@ -490,49 +349,6 @@ namespace CRM.Persistence.Migrations
                     b.HasIndex("Kind", "SectionNumber", "Level");
 
                     b.ToTable("GoalBankEntries");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.KeyArtsDate", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DateText")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Month")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Observance")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ObservanceType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ProgrammingTieIn")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Month", "SortOrder");
-
-                    b.ToTable("KeyArtsDates");
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.MonthlyProgressSnapshot", b =>
@@ -792,64 +608,6 @@ namespace CRM.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("ParticipantArtsProfiles");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.PerStarPlan", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AssignedStaffId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("HowIllSupport")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("MonthKey")
-                        .IsRequired()
-                        .HasMaxLength(7)
-                        .HasColumnType("nvarchar(7)");
-
-                    b.Property<string>("MonthlyGoal")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<Guid>("ParticipantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("PrimaryTier")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("PriorityObjectiveAreaId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("PrioritySubSkillId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssignedStaffId");
-
-                    b.HasIndex("PriorityObjectiveAreaId");
-
-                    b.HasIndex("PrioritySubSkillId");
-
-                    b.HasIndex("ParticipantId", "MonthKey")
-                        .IsUnique();
-
-                    b.ToTable("PerStarPlans");
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.Project", b =>
@@ -1472,19 +1230,6 @@ namespace CRM.Persistence.Migrations
                     b.ToTable("WeeklyNoteSelections");
                 });
 
-            modelBuilder.Entity("CRM.Domain.Entities.AgeModification", b =>
-                {
-                    b.HasOne("CRM.Domain.Entities.Game", null)
-                        .WithMany()
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("CRM.Domain.Entities.StaffMember", null)
-                        .WithMany()
-                        .HasForeignKey("TeacherSuggestedId")
-                        .OnDelete(DeleteBehavior.SetNull);
-                });
-
             modelBuilder.Entity("CRM.Domain.Entities.AttendanceNote", b =>
                 {
                     b.HasOne("CRM.Domain.Entities.AttendanceRecord", "AttendanceRecord")
@@ -1545,14 +1290,6 @@ namespace CRM.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("PrimaryObjectiveArea");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.GameIdea", b =>
-                {
-                    b.HasOne("CRM.Domain.Entities.StaffMember", null)
-                        .WithMany()
-                        .HasForeignKey("TeacherSuggestedId")
-                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.GameSubGoal", b =>
@@ -1640,38 +1377,6 @@ namespace CRM.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Participant");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.PerStarPlan", b =>
-                {
-                    b.HasOne("CRM.Domain.Entities.StaffMember", "AssignedStaff")
-                        .WithMany()
-                        .HasForeignKey("AssignedStaffId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CRM.Domain.Entities.Participant", "Participant")
-                        .WithMany()
-                        .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CRM.Domain.Entities.ObjectiveArea", "PriorityObjectiveArea")
-                        .WithMany()
-                        .HasForeignKey("PriorityObjectiveAreaId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CRM.Domain.Entities.SubSkill", "PrioritySubSkill")
-                        .WithMany()
-                        .HasForeignKey("PrioritySubSkillId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("AssignedStaff");
-
-                    b.Navigation("Participant");
-
-                    b.Navigation("PriorityObjectiveArea");
-
-                    b.Navigation("PrioritySubSkill");
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.ProjectTask", b =>

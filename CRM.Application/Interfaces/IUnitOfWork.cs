@@ -19,6 +19,14 @@ public interface IUnitOfWork : IDisposable
     IRepository<MonthlyProgressSnapshot> MonthlyProgressSnapshots { get; }
     IRepository<WeeklyFocusSkill> WeeklyFocusSkills { get; }
     IRepository<ScoreThreshold> ScoreThresholds { get; }
+    IRepository<GoalBankEntry> GoalBankEntries { get; }
+    IRepository<WeeklyNoteSelection> WeeklyNoteSelections { get; }
+    IRepository<MonthlySummary> MonthlySummaries { get; }
+    IRepository<GameIdea> GameIdeas { get; }
+    IRepository<AgeModification> AgeModifications { get; }
+    IRepository<PerStarPlan> PerStarPlans { get; }
+    IRepository<CalendarTheme> CalendarThemes { get; }
+    IRepository<KeyArtsDate> KeyArtsDates { get; }
     IRepository<AttendanceRecord> Attendance { get; }
     IRepository<AttendanceNote> AttendanceNotes { get; }
     IRepository<Session> Sessions { get; }

@@ -20,6 +20,14 @@ public class AppDbContext : DbContext
     public DbSet<MonthlyProgressSnapshot> MonthlyProgressSnapshots { get; set; }
     public DbSet<WeeklyFocusSkill> WeeklyFocusSkills { get; set; }
     public DbSet<ScoreThreshold> ScoreThresholds { get; set; }
+    public DbSet<GoalBankEntry> GoalBankEntries { get; set; }
+    public DbSet<WeeklyNoteSelection> WeeklyNoteSelections { get; set; }
+    public DbSet<MonthlySummary> MonthlySummaries { get; set; }
+    public DbSet<GameIdea> GameIdeas { get; set; }
+    public DbSet<AgeModification> AgeModifications { get; set; }
+    public DbSet<PerStarPlan> PerStarPlans { get; set; }
+    public DbSet<CalendarTheme> CalendarThemes { get; set; }
+    public DbSet<KeyArtsDate> KeyArtsDates { get; set; }
     public DbSet<Participant> Participants { get; set; }
     public DbSet<StaffMember> Staff { get; set; }
     public DbSet<StaffProgramAssignment> StaffProgramAssignments { get; set; }

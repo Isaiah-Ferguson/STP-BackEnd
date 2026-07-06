@@ -4,6 +4,7 @@ using CRM.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CRM.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260706162713_AddGameBacklogAndPlanning")]
+    partial class AddGameBacklogAndPlanning
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -176,61 +179,6 @@ namespace CRM.Persistence.Migrations
                     b.HasIndex("ProgramId");
 
                     b.ToTable("CalendarEvents");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.CalendarTheme", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AlternativeOptionsText")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FeaturedGamesText")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("KeyArtsDatesText")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("LegendArc")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Month")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductionPhase")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("ProgrammingNotes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("ThemeSubtitle")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("ThemeTitle")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Month")
-                        .IsUnique();
-
-                    b.ToTable("CalendarThemes");
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.CrmProgram", b =>
@@ -490,49 +438,6 @@ namespace CRM.Persistence.Migrations
                     b.HasIndex("Kind", "SectionNumber", "Level");
 
                     b.ToTable("GoalBankEntries");
-                });
-
-            modelBuilder.Entity("CRM.Domain.Entities.KeyArtsDate", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DateText")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Month")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Observance")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ObservanceType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ProgrammingTieIn")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Month", "SortOrder");
-
-                    b.ToTable("KeyArtsDates");
                 });
 
             modelBuilder.Entity("CRM.Domain.Entities.MonthlyProgressSnapshot", b =>

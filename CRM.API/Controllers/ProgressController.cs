@@ -64,4 +64,22 @@ public class ProgressController : ControllerBase
         var result = await _service.ConfirmMonthEndAsync(participantId, month, dto);
         return result is null ? NotFound() : Ok(result);
     }
+
+    [HttpPost("star/{participantId:guid}/note")]
+    public async Task<ActionResult<WeeklyNoteSelectionDto>> UpsertNote(
+        Guid participantId, [FromQuery] string month, [FromBody] UpsertNoteSelectionDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(month) || dto.WeekNumber < 1) return BadRequest("month and a weekNumber ≥ 1 are required.");
+        var result = await _service.UpsertNoteSelectionAsync(participantId, month, dto);
+        return result is null ? NotFound() : Ok(result);
+    }
+
+    [HttpPut("star/{participantId:guid}/summary")]
+    public async Task<ActionResult<MonthlySummaryDto>> UpsertSummary(
+        Guid participantId, [FromQuery] string month, [FromBody] UpsertMonthlySummaryDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(month)) return BadRequest("month is required.");
+        var result = await _service.UpsertMonthlySummaryAsync(participantId, month, dto);
+        return result is null ? NotFound() : Ok(result);
+    }
 }

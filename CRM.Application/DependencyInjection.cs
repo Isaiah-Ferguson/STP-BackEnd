@@ -12,6 +12,11 @@ public static class DependencyInjection
         services.AddScoped<IGameService, GameService>();
         services.AddScoped<IRosterService, RosterService>();
         services.AddScoped<IProgressTrackingService, ProgressTrackingService>();
+        services.AddScoped<IGoalBankService, GoalBankService>();
+        services.AddScoped<ICohortRollUpService, CohortRollUpService>();
+        services.AddScoped<IGameBacklogService, GameBacklogService>();
+        services.AddScoped<IPlanningService, PlanningService>();
+        services.AddScoped<IYearCalendarService, YearCalendarService>();
         services.AddScoped<IProgramService, ProgramService>();
         services.AddScoped<IParticipantService, ParticipantService>();
         services.AddScoped<IArtsProfileService, ArtsProfileService>();

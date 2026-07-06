@@ -26,6 +26,14 @@ public class UnitOfWork : IUnitOfWork
         MonthlyProgressSnapshots = new GenericRepository<MonthlyProgressSnapshot>(db);
         WeeklyFocusSkills = new GenericRepository<WeeklyFocusSkill>(db);
         ScoreThresholds = new GenericRepository<ScoreThreshold>(db);
+        GoalBankEntries = new GenericRepository<GoalBankEntry>(db);
+        WeeklyNoteSelections = new GenericRepository<WeeklyNoteSelection>(db);
+        MonthlySummaries = new GenericRepository<MonthlySummary>(db);
+        GameIdeas = new GenericRepository<GameIdea>(db);
+        AgeModifications = new GenericRepository<AgeModification>(db);
+        PerStarPlans = new GenericRepository<PerStarPlan>(db);
+        CalendarThemes = new GenericRepository<CalendarTheme>(db);
+        KeyArtsDates = new GenericRepository<KeyArtsDate>(db);
         Attendance = new GenericRepository<AttendanceRecord>(db);
         AttendanceNotes = new GenericRepository<AttendanceNote>(db);
         Sessions = new GenericRepository<Session>(db);
@@ -52,6 +60,14 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<MonthlyProgressSnapshot> MonthlyProgressSnapshots { get; }
     public IRepository<WeeklyFocusSkill> WeeklyFocusSkills { get; }
     public IRepository<ScoreThreshold> ScoreThresholds { get; }
+    public IRepository<GoalBankEntry> GoalBankEntries { get; }
+    public IRepository<WeeklyNoteSelection> WeeklyNoteSelections { get; }
+    public IRepository<MonthlySummary> MonthlySummaries { get; }
+    public IRepository<GameIdea> GameIdeas { get; }
+    public IRepository<AgeModification> AgeModifications { get; }
+    public IRepository<PerStarPlan> PerStarPlans { get; }
+    public IRepository<CalendarTheme> CalendarThemes { get; }
+    public IRepository<KeyArtsDate> KeyArtsDates { get; }
     public IRepository<AttendanceRecord> Attendance { get; }
     public IRepository<AttendanceNote> AttendanceNotes { get; }
     public IRepository<Session> Sessions { get; }
