@@ -47,8 +47,10 @@ public class ProgressTrackingService : IProgressTrackingService
         return current.Select(f => ToFocusDto(f, skills)).ToList();
     }
 
-    public async Task<WeeklyDataEntryDto> RecordWeeklyScoreAsync(RecordWeeklyScoreDto dto)
+    public async Task<WeeklyDataEntryDto> RecordWeeklyScoreAsync(Guid currentUserId, RecordWeeklyScoreDto dto)
     {
+        var recordedBy = await ResolveStaffIdAsync(currentUserId);
+
         var existing = (await _uow.WeeklyDataEntries.ListAsync(e =>
             e.ParticipantId == dto.ParticipantId && e.SubSkillId == dto.SubSkillId &&
             e.MonthKey == dto.MonthKey && e.WeekNumber == dto.WeekNumber)).FirstOrDefault();
@@ -66,7 +68,7 @@ public class ProgressTrackingService : IProgressTrackingService
                 WeekNumber = dto.WeekNumber,
                 WeekDate = weekDate,
                 Score = dto.Score,
-                RecordedByStaffMemberId = dto.RecordedByStaffMemberId,
+                RecordedByStaffMemberId = recordedBy,
             };
             await _uow.WeeklyDataEntries.AddAsync(existing);
         }
@@ -75,7 +77,7 @@ public class ProgressTrackingService : IProgressTrackingService
             existing.Score = dto.Score;
             existing.WeekDate = weekDate;
             existing.SessionId = dto.SessionId;
-            existing.RecordedByStaffMemberId = dto.RecordedByStaffMemberId;
+            existing.RecordedByStaffMemberId = recordedBy;
             await _uow.WeeklyDataEntries.UpdateAsync(existing);
         }
 
@@ -236,9 +238,10 @@ public class ProgressTrackingService : IProgressTrackingService
             .ToList();
     }
 
-    public async Task<MonthlyProgressSnapshotDto?> ConfirmMonthEndAsync(Guid participantId, string monthKey, ConfirmMonthEndDto dto)
+    public async Task<MonthlyProgressSnapshotDto?> ConfirmMonthEndAsync(Guid currentUserId, Guid participantId, string monthKey, ConfirmMonthEndDto dto)
     {
         if (await _uow.Participants.GetByIdAsync(participantId) is null) return null;
+        var confirmedBy = await ResolveStaffIdAsync(currentUserId);
 
         var snap = (await _uow.MonthlyProgressSnapshots.ListAsync(s =>
             s.ParticipantId == participantId && s.MonthKey == monthKey && s.SubSkillId == dto.SubSkillId)).FirstOrDefault();
@@ -253,7 +256,7 @@ public class ProgressTrackingService : IProgressTrackingService
                 Level = dto.Level,
                 SuggestedLevel = dto.Level,
                 IsConfirmed = true,
-                ConfirmedByStaffMemberId = dto.ConfirmedByStaffMemberId,
+                ConfirmedByStaffMemberId = confirmedBy,
             };
             await _uow.MonthlyProgressSnapshots.AddAsync(snap);
         }
@@ -261,7 +264,7 @@ public class ProgressTrackingService : IProgressTrackingService
         {
             snap.Level = dto.Level;
             snap.IsConfirmed = true;
-            snap.ConfirmedByStaffMemberId = dto.ConfirmedByStaffMemberId;
+            snap.ConfirmedByStaffMemberId = confirmedBy;
             await _uow.MonthlyProgressSnapshots.UpdateAsync(snap);
         }
 
@@ -270,6 +273,10 @@ public class ProgressTrackingService : IProgressTrackingService
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────────
+
+    /// <summary>The caller's linked staff-member id (null for accounts not linked to staff, e.g. pure admins).</summary>
+    private async Task<Guid?> ResolveStaffIdAsync(Guid userId) =>
+        (await _uow.Users.GetByIdAsync(userId))?.StaffMemberId;
 
     private async Task<Dictionary<Guid, SubSkill>> SubSkillMapAsync() =>
         (await _uow.SubSkills.GetAllAsync()).ToDictionary(s => s.Id);

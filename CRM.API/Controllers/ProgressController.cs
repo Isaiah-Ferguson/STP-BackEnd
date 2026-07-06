@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using CRM.Application.DTOs.Progress;
 using CRM.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +24,7 @@ public class ProgressController : ControllerBase
     }
 
     [HttpPut("focus-skills")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<IReadOnlyList<WeeklyFocusSkillDto>>> SetFocusSkills([FromBody] SetFocusSkillsDto dto)
     {
         if (dto.ProgramId == Guid.Empty || string.IsNullOrWhiteSpace(dto.MonthKey) || dto.WeekNumber < 1)
@@ -35,8 +37,7 @@ public class ProgressController : ControllerBase
     {
         if (dto.ParticipantId == Guid.Empty || dto.SubSkillId == Guid.Empty || string.IsNullOrWhiteSpace(dto.MonthKey) || dto.WeekNumber < 1)
             return BadRequest("participantId, subSkillId, monthKey and a weekNumber ≥ 1 are required.");
-        dto.RecordedByStaffMemberId ??= null; // stamped by client for now
-        return Ok(await _service.RecordWeeklyScoreAsync(dto));
+        return Ok(await _service.RecordWeeklyScoreAsync(CurrentUserId(), dto));
     }
 
     [HttpGet("star/{participantId:guid}")]
@@ -60,8 +61,7 @@ public class ProgressController : ControllerBase
         Guid participantId, [FromQuery] string month, [FromBody] ConfirmMonthEndDto dto)
     {
         if (string.IsNullOrWhiteSpace(month) || dto.SubSkillId == Guid.Empty) return BadRequest("month and subSkillId are required.");
-        dto.ConfirmedByStaffMemberId ??= null;
-        var result = await _service.ConfirmMonthEndAsync(participantId, month, dto);
+        var result = await _service.ConfirmMonthEndAsync(CurrentUserId(), participantId, month, dto);
         return result is null ? NotFound() : Ok(result);
     }
 
@@ -81,5 +81,11 @@ public class ProgressController : ControllerBase
         if (string.IsNullOrWhiteSpace(month)) return BadRequest("month is required.");
         var result = await _service.UpsertMonthlySummaryAsync(participantId, month, dto);
         return result is null ? NotFound() : Ok(result);
+    }
+
+    private Guid CurrentUserId()
+    {
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        return Guid.TryParse(idClaim, out var id) ? id : Guid.Empty;
     }
 }

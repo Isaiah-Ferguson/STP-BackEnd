@@ -59,7 +59,9 @@ public class ParticipantsController : ControllerBase
         return profile is null ? NotFound() : Ok(profile);
     }
 
+    /// <summary>Sets the Student Frame. Admin only — management authors these personalised fields.</summary>
     [HttpPut("{id:guid}/arts-profile")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ParticipantArtsProfileDto>> UpsertArtsProfile(Guid id, [FromBody] UpsertArtsProfileDto dto)
     {
         var profile = await _artsProfile.UpsertAsync(id, dto);

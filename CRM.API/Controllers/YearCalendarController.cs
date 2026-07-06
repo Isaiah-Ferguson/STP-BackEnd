@@ -22,6 +22,7 @@ public class YearCalendarController : ControllerBase
         Ok(await _service.GetKeyArtsDatesAsync());
 
     [HttpPut("theme")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<CalendarThemeDto>> UpsertTheme([FromBody] UpsertCalendarThemeDto dto)
     {
         if (dto.Month < 1 || dto.Month > 12) return BadRequest("Month must be 1–12.");

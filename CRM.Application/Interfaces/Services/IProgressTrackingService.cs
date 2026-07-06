@@ -10,8 +10,8 @@ public interface IProgressTrackingService
     /// <summary>Replaces the focus skills for one program-week; returns the new set.</summary>
     Task<IReadOnlyList<WeeklyFocusSkillDto>> SetFocusSkillsAsync(SetFocusSkillsDto dto);
 
-    /// <summary>Records (upserts) one weekly Data score for a Star on a sub-skill.</summary>
-    Task<WeeklyDataEntryDto> RecordWeeklyScoreAsync(RecordWeeklyScoreDto dto);
+    /// <summary>Records (upserts) one weekly Data score for a Star on a sub-skill; stamps the recorder from the caller.</summary>
+    Task<WeeklyDataEntryDto> RecordWeeklyScoreAsync(Guid currentUserId, RecordWeeklyScoreDto dto);
 
     /// <summary>A Star's full month: weekly entries + month-end snapshots. Null if the participant doesn't exist.</summary>
     Task<StarMonthDto?> GetStarMonthAsync(Guid participantId, string monthKey);
@@ -19,8 +19,8 @@ public interface IProgressTrackingService
     /// <summary>(Re)derives suggested month-end levels for every active sub-skill; preserves confirmed levels. Null if the participant doesn't exist.</summary>
     Task<IReadOnlyList<MonthlyProgressSnapshotDto>?> ComputeMonthEndAsync(Guid participantId, string monthKey);
 
-    /// <summary>Confirms (or overrides) a Star's month-end level for one sub-skill. Null if the participant doesn't exist.</summary>
-    Task<MonthlyProgressSnapshotDto?> ConfirmMonthEndAsync(Guid participantId, string monthKey, ConfirmMonthEndDto dto);
+    /// <summary>Confirms (or overrides) a Star's month-end level for one sub-skill; stamps the confirmer from the caller. Null if the participant doesn't exist.</summary>
+    Task<MonthlyProgressSnapshotDto?> ConfirmMonthEndAsync(Guid currentUserId, Guid participantId, string monthKey, ConfirmMonthEndDto dto);
 
     /// <summary>Records (upserts) a Section-6 note for a Star in one week. Null if the participant doesn't exist.</summary>
     Task<WeeklyNoteSelectionDto?> UpsertNoteSelectionAsync(Guid participantId, string monthKey, UpsertNoteSelectionDto dto);

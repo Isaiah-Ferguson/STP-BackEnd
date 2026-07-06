@@ -53,6 +53,19 @@ public class ProgramService : IProgramService
         }).ToList();
     }
 
+    public async Task<IReadOnlyList<ProgramSummaryDto>> GetForUserAsync(Guid userId)
+    {
+        var all = await GetAllAsync();
+        var user = await _uow.Users.GetByIdAsync(userId);
+        if (user is null) return new List<ProgramSummaryDto>();
+        if (user.Role == Domain.Enums.UserRole.Admin) return all;
+        if (user.StaffMemberId is not { } staffId) return new List<ProgramSummaryDto>();
+
+        var assignments = await _uow.GetStaffProgramAssignmentsAsync();
+        var allowed = assignments.Where(a => a.StaffMemberId == staffId).Select(a => a.ProgramId).ToHashSet();
+        return all.Where(p => allowed.Contains(p.Id)).ToList();
+    }
+
     public async Task<ProgramSummaryDto?> GetBySlugAsync(string slug)
     {
         var all = await GetAllAsync();

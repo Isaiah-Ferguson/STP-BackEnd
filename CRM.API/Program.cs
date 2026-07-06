@@ -56,7 +56,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // Management-write surfaces (roster, games, calendar themes, focus skills) are open to
+    // Admins (user role) and Coordinators/Admins (linked staff role). Teachers are read-only there.
+    options.AddPolicy("ManagementWrite", policy => policy.RequireAssertion(ctx =>
+        ctx.User.IsInRole("Admin")
+        || ctx.User.HasClaim("staffRole", "Coordinator")
+        || ctx.User.HasClaim("staffRole", "Admin")));
+});
 
 // ---------------------------------------------------------
 // Swagger / OpenAPI

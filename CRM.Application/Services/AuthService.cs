@@ -37,7 +37,12 @@ public class AuthService : IAuthService
         await _uow.Users.UpdateAsync(user);
         await _uow.SaveChangesAsync();
 
-        var (token, expiresAt) = _tokens.CreateToken(user);
+        // Include the linked staff role so management-write policies can allow Coordinators.
+        StaffRole? staffRole = user.StaffMemberId is { } sid
+            ? (await _uow.Staff.GetByIdAsync(sid))?.Role
+            : null;
+
+        var (token, expiresAt) = _tokens.CreateToken(user, staffRole);
         return new AuthResultDto
         {
             Token = token,

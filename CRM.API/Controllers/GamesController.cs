@@ -43,6 +43,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<GameDetailDto>> CreateGame([FromBody] CreateGameDto dto)
     {
         var created = await _service.CreateAsync(dto);
@@ -50,6 +51,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<GameDetailDto>> UpdateGame(Guid id, [FromBody] UpdateGameDto dto)
     {
         var updated = await _service.UpdateAsync(id, dto);

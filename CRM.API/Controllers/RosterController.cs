@@ -35,8 +35,9 @@ public class RosterController : ControllerBase
         return Ok(await _service.GetMyStarsAsync(CurrentUserId(), year, quarter));
     }
 
-    /// <summary>Creates or updates a participant's assignment for a term.</summary>
+    /// <summary>Creates or updates a participant's assignment for a term. Management only.</summary>
     [HttpPut("assignment")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<RosterEntryDto>> UpsertAssignment([FromBody] UpsertRosterAssignmentDto dto)
     {
         if (dto.Year < 2020 || dto.Quarter < 1 || dto.Quarter > 4)

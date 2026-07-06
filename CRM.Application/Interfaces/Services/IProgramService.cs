@@ -5,6 +5,10 @@ namespace CRM.Application.Interfaces.Services;
 public interface IProgramService
 {
     Task<IReadOnlyList<ProgramSummaryDto>> GetAllAsync();
+
+    /// <summary>The programs the caller may work in: all for an Admin, otherwise their linked staff's assigned programs.</summary>
+    Task<IReadOnlyList<ProgramSummaryDto>> GetForUserAsync(Guid userId);
+
     Task<ProgramSummaryDto?> GetBySlugAsync(string slug);
     Task<ProgramDetailDto?> GetDetailAsync(string slug);
     Task<ProgramSummaryDto> CreateAsync(CreateProgramDto dto);

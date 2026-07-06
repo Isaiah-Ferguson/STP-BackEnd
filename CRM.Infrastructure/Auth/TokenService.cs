@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using CRM.Application.Interfaces;
 using CRM.Domain.Entities;
+using CRM.Domain.Enums;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,12 +16,14 @@ public class TokenService : ITokenService
     public const string SubClaim = "sub";
     public const string NameClaim = "name";
     public const string RoleClaim = "role";
+    /// <summary>The linked staff member's role (Teacher/Coordinator/Admin), for management-write policies.</summary>
+    public const string StaffRoleClaim = "staffRole";
 
     private readonly JwtSettings _settings;
 
     public TokenService(IOptions<JwtSettings> settings) => _settings = settings.Value;
 
-    public (string Token, DateTime ExpiresAt) CreateToken(User user)
+    public (string Token, DateTime ExpiresAt) CreateToken(User user, StaffRole? staffRole = null)
     {
         var expiresAt = DateTime.UtcNow.AddMinutes(_settings.ExpiryMinutes);
 
@@ -32,6 +35,8 @@ public class TokenService : ITokenService
             new(NameClaim, user.FullName),
             new(RoleClaim, user.Role.ToString()),
         };
+        if (staffRole is { } sr)
+            claims.Add(new Claim(StaffRoleClaim, sr.ToString()));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

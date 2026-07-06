@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using CRM.Application.DTOs.Programs;
 using CRM.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +18,11 @@ public class ProgramsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ProgramSummaryDto>>> GetAll() =>
         Ok(await _service.GetAllAsync());
+
+    /// <summary>The caller's in-scope programs (all for an Admin; assigned programs for staff). Literal route wins over {slug}.</summary>
+    [HttpGet("mine")]
+    public async Task<ActionResult<IReadOnlyList<ProgramSummaryDto>>> GetMine() =>
+        Ok(await _service.GetForUserAsync(CurrentUserId()));
 
     [HttpGet("{slug}")]
     public async Task<ActionResult<ProgramSummaryDto>> GetBySlug(string slug)
@@ -44,5 +50,11 @@ public class ProgramsController : ControllerBase
     {
         var result = await _service.UpdateAsync(id, dto);
         return result is null ? NotFound() : Ok(result);
+    }
+
+    private Guid CurrentUserId()
+    {
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        return Guid.TryParse(idClaim, out var id) ? id : Guid.Empty;
     }
 }
