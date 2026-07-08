@@ -4,8 +4,19 @@ namespace CRM.Application.Interfaces.Services;
 
 public interface IAttendanceService
 {
-    Task<AttendanceSessionDto?> GetSessionAsync(Guid sessionId);
-    Task<bool> UpdateRecordAsync(Guid recordId, UpdateAttendanceDto dto);
+    /// <summary>
+    /// Existing session roster by id. Returns null if not found; throws
+    /// <see cref="UnauthorizedAccessException"/> if the caller is not assigned to the
+    /// session's program.
+    /// </summary>
+    Task<AttendanceSessionDto?> GetSessionAsync(Guid userId, Guid sessionId);
+
+    /// <summary>
+    /// Updates an attendance record's status. Returns false if not found; throws
+    /// <see cref="UnauthorizedAccessException"/> if the caller is not assigned to the
+    /// record's program, or <see cref="InvalidOperationException"/> if the session is submitted.
+    /// </summary>
+    Task<bool> UpdateRecordAsync(Guid userId, Guid recordId, UpdateAttendanceDto dto);
 
     /// <summary>
     /// Returns today's attendance roster across all programs, lazily creating the
@@ -42,6 +53,10 @@ public interface IAttendanceService
     /// </summary>
     Task<IReadOnlyList<AttendanceRosterEntryDto>> GetTodayRosterReadOnlyAsync();
 
-    /// <summary>Adds a note to an attendance record. Returns null if the record is not found.</summary>
-    Task<AttendanceNoteDto?> AddNoteAsync(Guid recordId, CreateAttendanceNoteDto dto);
+    /// <summary>
+    /// Adds a note to an attendance record. Returns null if the record is not found; throws
+    /// <see cref="UnauthorizedAccessException"/> if the caller is not assigned to the
+    /// record's program.
+    /// </summary>
+    Task<AttendanceNoteDto?> AddNoteAsync(Guid userId, Guid recordId, CreateAttendanceNoteDto dto);
 }

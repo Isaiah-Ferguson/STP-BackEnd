@@ -288,6 +288,59 @@ public static class DataSeeder
     }
 
     /// <summary>
+    /// Seeds the demo Script Library so the Scripts page has content in every environment
+    /// (explicit client request — the Scripts page is kept as a working UI demo, #18).
+    /// Idempotent — skips entirely once any script exists. Links each script to the programs
+    /// it names, when those programs exist (matched by slug); the "productions" tag has no
+    /// backing program and is simply not linked.
+    /// </summary>
+    public static async Task SeedScriptsAsync(AppDbContext db)
+    {
+        if (await db.Scripts.AnyAsync()) return;
+
+        var programIdBySlug = await db.Programs.ToDictionaryAsync(p => p.Slug, p => p.Id);
+
+        // (Title, Subtitle, Type, Status, IsOriginal, IsAdapted, CastMin, CastMax, Duration, ProgramSlugs)
+        var rows = new (string Title, string? Subtitle, ScriptType Type, ScriptStatus Status,
+            bool IsOriginal, bool IsAdapted, int? CastMin, int? CastMax, string? Duration, string[] Slugs)[]
+        {
+            ("The Magic Garden", "An original musical in two acts", ScriptType.Musical, ScriptStatus.Active, true, false, 12, 18, "55 min", new[] { "pathways" }),
+            ("Cinderella", "Adapted for performing arts", ScriptType.Play, ScriptStatus.Active, false, true, 8, 12, "40 min", new[] { "mjc" }),
+            ("Under the Sea", "A musical celebration", ScriptType.Musical, ScriptStatus.Active, true, false, 6, 10, "35 min", new[] { "manteca" }),
+            ("The Brave Little Star", "Scene collection — one act per program group", ScriptType.Scene, ScriptStatus.Active, true, false, 4, 8, "20 min / scene", new[] { "mjc", "pathways", "manteca" }),
+            ("Stardust", "New original musical — in development", ScriptType.Musical, ScriptStatus.Draft, true, false, null, null, "TBD", Array.Empty<string>()),
+            ("A Midsummer Dream", "Adapted from Shakespeare", ScriptType.Play, ScriptStatus.Archived, false, true, 15, 20, "60 min", Array.Empty<string>()),
+            ("Rainbow Road", "A musical journey", ScriptType.Musical, ScriptStatus.Archived, true, false, 10, 14, "45 min", new[] { "mjc", "pathways" }),
+            ("The Lighthouse Keeper", null, ScriptType.Play, ScriptStatus.Archived, true, false, 6, 8, "30 min", new[] { "manteca" }),
+        };
+
+        foreach (var row in rows)
+        {
+            var script = new Script
+            {
+                Title = row.Title,
+                Subtitle = row.Subtitle,
+                Type = row.Type,
+                Status = row.Status,
+                IsOriginal = row.IsOriginal,
+                IsAdapted = row.IsAdapted,
+                CastMin = row.CastMin,
+                CastMax = row.CastMax,
+                Duration = row.Duration,
+            };
+            db.Scripts.Add(script);
+
+            foreach (var slug in row.Slugs)
+            {
+                if (programIdBySlug.TryGetValue(slug, out var programId))
+                    db.ScriptPrograms.Add(new ScriptProgram { Script = script, ProgramId = programId });
+            }
+        }
+
+        await db.SaveChangesAsync();
+    }
+
+    /// <summary>
     /// Seeds the Games Library (~57 games from the Annual Programming Calendar), tagging each
     /// to the shared taxonomy by slug. Idempotent — skips entirely once any game exists. The
     /// taxonomy (ObjectiveAreas + SubSkills) is seeded by the AddSkillsTaxonomy migration, so it

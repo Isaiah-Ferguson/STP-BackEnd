@@ -13,6 +13,11 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
         builder.Property(s => s.TimeRange).HasMaxLength(50);
         builder.Property(s => s.Label).HasMaxLength(200);
 
+        // One session per program per day (#9). The service normalizes Date to midnight,
+        // so this reliably collapses the check-then-insert race between two teachers opening
+        // the same program concurrently.
+        builder.HasIndex(s => new { s.ProgramId, s.Date }).IsUnique();
+
         builder.HasOne(s => s.Program)
                .WithMany(p => p.Sessions)
                .HasForeignKey(s => s.ProgramId)

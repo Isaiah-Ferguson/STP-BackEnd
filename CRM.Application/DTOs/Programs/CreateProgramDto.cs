@@ -1,13 +1,25 @@
+using System.ComponentModel.DataAnnotations;
 using CRM.Domain.Enums;
 
 namespace CRM.Application.DTOs.Programs;
 
 public class CreateProgramDto
 {
+    [Required]
+    [StringLength(100, MinimumLength = 1)]
     public string Name { get; set; } = string.Empty;
+
+    [Required]
+    [RegularExpression("^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+        ErrorMessage = "ColorHex must be a hex color such as #378add.")]
     public string ColorHex { get; set; } = string.Empty;
+
+    [StringLength(100)]
     public string? SessionSchedule { get; set; }
+
+    [StringLength(100)]
     public string? DefaultLocation { get; set; }
+
     public MeetingDays MeetingDays { get; set; } = MeetingDays.None;
     public TimeOnly? StartTime { get; set; }
     public TimeOnly? EndTime { get; set; }

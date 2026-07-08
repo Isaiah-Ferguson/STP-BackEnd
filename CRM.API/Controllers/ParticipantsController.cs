@@ -31,6 +31,7 @@ public class ParticipantsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<ParticipantDetailDto>> Create([FromBody] CreateParticipantDto dto)
     {
         var result = await _service.CreateAsync(dto);
@@ -38,13 +39,16 @@ public class ParticipantsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<ParticipantDetailDto>> Update(Guid id, [FromBody] UpdateParticipantDto dto)
     {
         var result = await _service.UpdateAsync(id, dto);
         return result is null ? NotFound() : Ok(result);
     }
 
+    // Permanent deletion of a child's PII — restricted to Admins.
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var deleted = await _service.DeleteAsync(id);

@@ -39,6 +39,7 @@ public class ProgramsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<ProgramSummaryDto>> Create([FromBody] CreateProgramDto dto)
     {
         var result = await _service.CreateAsync(dto);
@@ -46,6 +47,7 @@ public class ProgramsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<ProgramSummaryDto>> Update(Guid id, [FromBody] UpdateProgramDto dto)
     {
         var result = await _service.UpdateAsync(id, dto);

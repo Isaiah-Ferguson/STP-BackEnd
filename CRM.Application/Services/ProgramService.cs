@@ -20,6 +20,9 @@ public class ProgramService : IProgramService
         var participants = await _uow.Participants.GetAllAsync();
         var sessions = await _uow.Sessions.GetAllAsync();
 
+        // Attendance % is computed from real records (#8), not the stale seeded column.
+        var pctMap = AttendanceStats.PercentByParticipant(await _uow.Attendance.GetAllAsync());
+
         var ptsByProgram = participants
             .GroupBy(p => p.ProgramId)
             .ToDictionary(g => g.Key, g => g.ToList());
@@ -45,7 +48,7 @@ public class ProgramService : IProgramService
                 StartTime = p.StartTime,
                 EndTime = p.EndTime,
                 EnrolledCount = pts.Count(x => x.Status == Domain.Enums.ParticipantStatus.Active),
-                AttendancePct = pts.Any() ? (int)pts.Average(x => x.AttendancePct) : null,
+                AttendancePct = pts.Any() ? (int)Math.Round(pts.Average(x => (double)pctMap.GetValueOrDefault(x.Id, 0))) : null,
                 NextSessionDate = next?.Date.ToString("MMM d"),
                 NextSessionMeta = next?.Room is string r ? $"{next.Date:dddd} · {r}" : null,
                 AlertCount = pts.Count(x => x.Status == Domain.Enums.ParticipantStatus.Attention),
@@ -84,6 +87,11 @@ public class ProgramService : IProgramService
         var sessions = (await _uow.Sessions.GetAllAsync())
             .Where(s => s.ProgramId == program.Id).ToList();
 
+        // Real per-participant attendance % (#8), scoped to this program's participants.
+        var participantIds = participants.Select(p => p.Id).ToHashSet();
+        var pctMap = AttendanceStats.PercentByParticipant(
+            await _uow.Attendance.ListAsync(r => participantIds.Contains(r.ParticipantId)));
+
         var events = (await _uow.CalendarEvents.GetAllAsync())
             .Where(e => e.ProgramId == program.Id && e.IsUpcoming)
             .OrderBy(e => e.Date)
@@ -113,7 +121,7 @@ public class ProgramService : IProgramService
                 Status = p.Status,
                 ProgramId = p.ProgramId,
                 ProgramName = program.Name,
-                AttendancePct = p.AttendancePct,
+                AttendancePct = pctMap.GetValueOrDefault(p.Id, 0),
                 StartDate = p.StartDate.ToString("yyyy-MM-dd"),
                 HasDocAlerts = false,
             }).ToList(),

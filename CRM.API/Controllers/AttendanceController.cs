@@ -58,8 +58,15 @@ public class AttendanceController : ControllerBase
     [HttpGet("session/{sessionId:guid}")]
     public async Task<ActionResult<AttendanceSessionDto>> GetSession(Guid sessionId)
     {
-        var result = await _service.GetSessionAsync(sessionId);
-        return result is null ? NotFound() : Ok(result);
+        try
+        {
+            var result = await _service.GetSessionAsync(CurrentUserId(), sessionId);
+            return result is null ? NotFound() : Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+        }
     }
 
     /// <summary>Finalizes a session, locking its records.</summary>
@@ -82,8 +89,12 @@ public class AttendanceController : ControllerBase
     {
         try
         {
-            var updated = await _service.UpdateRecordAsync(recordId, dto);
+            var updated = await _service.UpdateRecordAsync(CurrentUserId(), recordId, dto);
             return updated ? NoContent() : NotFound();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
         }
         catch (InvalidOperationException ex)
         {
@@ -94,8 +105,15 @@ public class AttendanceController : ControllerBase
     [HttpPost("{recordId:guid}/notes")]
     public async Task<ActionResult<AttendanceNoteDto>> AddNote(Guid recordId, [FromBody] CreateAttendanceNoteDto dto)
     {
-        var note = await _service.AddNoteAsync(recordId, dto);
-        return note is null ? NotFound() : Ok(note);
+        try
+        {
+            var note = await _service.AddNoteAsync(CurrentUserId(), recordId, dto);
+            return note is null ? NotFound() : Ok(note);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+        }
     }
 
     private Guid CurrentUserId()

@@ -1,0 +1,34 @@
+using CRM.Domain.Entities;
+using CRM.Domain.Enums;
+
+namespace CRM.Application.Services;
+
+/// <summary>
+/// Computes real attendance percentages from <see cref="AttendanceRecord"/>s (#8).
+/// The denormalized <c>Participant.AttendancePct</c> column was only ever written by the
+/// dev seeder and is never recomputed, so it must not be used for display — it reads 0 for
+/// every API-created participant and a stale constant for seeded ones.
+/// </summary>
+public static class AttendanceStats
+{
+    /// <summary>
+    /// Attendance % for one participant = Present / (Present + Absent) across marked records.
+    /// Unmarked records are ignored. Returns 0 when there are no marked records.
+    /// </summary>
+    public static int PercentFor(IEnumerable<AttendanceRecord> records)
+    {
+        var present = 0;
+        var marked = 0;
+        foreach (var r in records)
+        {
+            if (r.Status == AttendanceStatus.Present) { present++; marked++; }
+            else if (r.Status == AttendanceStatus.Absent) { marked++; }
+        }
+        return marked == 0 ? 0 : (int)Math.Round(100.0 * present / marked);
+    }
+
+    /// <summary>Builds participantId → attendance % from a flat set of records.</summary>
+    public static Dictionary<Guid, int> PercentByParticipant(IEnumerable<AttendanceRecord> records) =>
+        records.GroupBy(r => r.ParticipantId)
+               .ToDictionary(g => g.Key, g => PercentFor(g));
+}

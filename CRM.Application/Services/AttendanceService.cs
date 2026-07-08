@@ -12,10 +12,12 @@ public class AttendanceService : IAttendanceService
 
     public AttendanceService(IUnitOfWork uow) => _uow = uow;
 
-    public async Task<AttendanceSessionDto?> GetSessionAsync(Guid sessionId)
+    public async Task<AttendanceSessionDto?> GetSessionAsync(Guid userId, Guid sessionId)
     {
         var session = await _uow.Sessions.GetByIdAsync(sessionId);
         if (session is null) return null;
+
+        await EnsureAssignedToProgramAsync(userId, session.ProgramId);
 
         var records = await _uow.Attendance.ListAsync(r => r.SessionId == sessionId);
 
@@ -47,13 +49,18 @@ public class AttendanceService : IAttendanceService
         };
     }
 
-    public async Task<bool> UpdateRecordAsync(Guid recordId, UpdateAttendanceDto dto)
+    public async Task<bool> UpdateRecordAsync(Guid userId, Guid recordId, UpdateAttendanceDto dto)
     {
         var record = await _uow.Attendance.GetByIdAsync(recordId);
         if (record is null) return false;
 
-        // A submitted session is finalized — its records are locked.
         var session = await _uow.Sessions.GetByIdAsync(record.SessionId);
+
+        // Only teachers assigned to the record's program (or an Admin) may edit it.
+        if (session is not null)
+            await EnsureAssignedToProgramAsync(userId, session.ProgramId);
+
+        // A submitted session is finalized — its records are locked.
         if (session is not null && session.Status == SessionStatus.Submitted)
             throw new InvalidOperationException("This session has been submitted and can no longer be edited.");
 
@@ -367,10 +374,14 @@ public class AttendanceService : IAttendanceService
             .ToList();
     }
 
-    public async Task<AttendanceNoteDto?> AddNoteAsync(Guid recordId, CreateAttendanceNoteDto dto)
+    public async Task<AttendanceNoteDto?> AddNoteAsync(Guid userId, Guid recordId, CreateAttendanceNoteDto dto)
     {
         var record = await _uow.Attendance.GetByIdAsync(recordId);
         if (record is null) return null;
+
+        var session = await _uow.Sessions.GetByIdAsync(record.SessionId);
+        if (session is not null)
+            await EnsureAssignedToProgramAsync(userId, session.ProgramId);
 
         var note = new AttendanceNote
         {
@@ -385,6 +396,23 @@ public class AttendanceService : IAttendanceService
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Throws <see cref="UnauthorizedAccessException"/> unless the user is an Admin or a staff
+    /// member assigned to <paramref name="programId"/>. Prevents one teacher from reading or
+    /// editing another program's attendance by record/session GUID (IDOR, #5).
+    /// </summary>
+    private async Task EnsureAssignedToProgramAsync(Guid userId, Guid programId)
+    {
+        var (isAdmin, staffMemberId) = await ResolveUserAsync(userId);
+        if (isAdmin) return;
+
+        var assignments = await _uow.GetStaffProgramAssignmentsAsync();
+        var assigned = staffMemberId is { } sid
+            && assignments.Any(a => a.StaffMemberId == sid && a.ProgramId == programId);
+        if (!assigned)
+            throw new UnauthorizedAccessException("You are not assigned to this program.");
+    }
 
     /// <summary>Resolves the calling user to (isAdmin, linked staff id) for program scoping.</summary>
     private async Task<(bool IsAdmin, Guid? StaffMemberId)> ResolveUserAsync(Guid userId)

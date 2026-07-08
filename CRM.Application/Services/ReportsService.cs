@@ -21,6 +21,9 @@ public class ReportsService : IReportsService
         var records = await _uow.Attendance.GetAllAsync();
         var tasks = await _uow.Tasks.GetAllAsync();
 
+        // Real per-participant attendance % (#8), computed from the records already loaded.
+        var pctMap = AttendanceStats.PercentByParticipant(records);
+
         var ptsByProgram = participants
             .GroupBy(p => p.ProgramId)
             .ToDictionary(g => g.Key, g => g.ToList());
@@ -37,7 +40,7 @@ public class ReportsService : IReportsService
                     Slug = p.Slug,
                     Name = p.Name,
                     Enrolled = pts.Count(x => x.Status == ParticipantStatus.Active),
-                    AttendancePct = pts.Count > 0 ? (int)Math.Round(pts.Average(x => x.AttendancePct)) : 0,
+                    AttendancePct = pts.Count > 0 ? (int)Math.Round(pts.Average(x => (double)pctMap.GetValueOrDefault(x.Id, 0))) : 0,
                     Sessions = sessionCountByProgram.GetValueOrDefault(p.Id, 0),
                 };
             })
@@ -58,7 +61,7 @@ public class ReportsService : IReportsService
             Programs = programs.Count,
             Staff = staff.Count,
             FullyOnboardedStaff = staff.Count(s => s.OnboardingProgressPct == 100),
-            AvgAttendancePct = participants.Count > 0 ? (int)Math.Round(participants.Average(p => p.AttendancePct)) : 0,
+            AvgAttendancePct = participants.Count > 0 ? (int)Math.Round(participants.Average(p => (double)pctMap.GetValueOrDefault(p.Id, 0))) : 0,
             OpenTasks = tasks.Count(t => t.Status != Domain.Enums.TaskStatus.Done),
             OverdueTasks = tasks.Count(t => t.IsOverdue || t.Status == Domain.Enums.TaskStatus.Overdue),
         };

@@ -3,6 +3,7 @@ using CRM.Application.Interfaces;
 using CRM.Application.Interfaces.Services;
 using CRM.Domain.Entities;
 using CRM.Domain.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace CRM.Application.Services;
 
@@ -11,12 +12,14 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _uow;
     private readonly IPasswordHasher _hasher;
     private readonly ITokenService _tokens;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(IUnitOfWork uow, IPasswordHasher hasher, ITokenService tokens)
+    public AuthService(IUnitOfWork uow, IPasswordHasher hasher, ITokenService tokens, ILogger<AuthService> logger)
     {
         _uow = uow;
         _hasher = hasher;
         _tokens = tokens;
+        _logger = logger;
     }
 
     public async Task<AuthResultDto?> LoginAsync(LoginDto dto)
@@ -31,7 +34,15 @@ public class AuthService : IAuthService
         var valid = _hasher.VerifyPassword(dto.Password, hash, salt);
 
         if (user is null || !user.IsActive || !valid)
+        {
+            // Log failed attempts so credential-stuffing shows up in the logs. Do not log
+            // the password; the email is fine (it was submitted in cleartext anyway).
+            var reason = user is null ? "no such user"
+                : !user.IsActive ? "account inactive"
+                : "bad password";
+            _logger.LogWarning("Failed login for {Email}: {Reason}.", email, reason);
             return null;
+        }
 
         user.LastLoginAt = DateTime.UtcNow;
         await _uow.Users.UpdateAsync(user);
@@ -43,6 +54,7 @@ public class AuthService : IAuthService
             : null;
 
         var (token, expiresAt) = _tokens.CreateToken(user, staffRole);
+        _logger.LogInformation("User {UserId} logged in.", user.Id);
         return new AuthResultDto
         {
             Token = token,

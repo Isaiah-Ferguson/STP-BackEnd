@@ -1,25 +1,43 @@
+using System.ComponentModel.DataAnnotations;
 using CRM.Domain.Enums;
 
 namespace CRM.Application.DTOs.Auth;
 
 public class LoginDto
 {
+    [Required]
+    [EmailAddress]
+    [StringLength(256)]
     public string Email { get; set; } = string.Empty;
+
+    [Required]
     public string Password { get; set; } = string.Empty;
 }
 
 public class RegisterUserDto
 {
+    [Required]
+    [EmailAddress]
+    [StringLength(256)]
     public string Email { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(200, MinimumLength = 1)]
     public string FullName { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(128, MinimumLength = 8)]
     public string Password { get; set; } = string.Empty;
+
     public UserRole Role { get; set; } = UserRole.Staff;
     public Guid? StaffMemberId { get; set; }
 }
 
 public class UpdateUserDto
 {
+    [StringLength(200, MinimumLength = 1)]
     public string? FullName { get; set; }
+
     public UserRole? Role { get; set; }
     public bool? IsActive { get; set; }
     public Guid? StaffMemberId { get; set; }
@@ -27,12 +45,18 @@ public class UpdateUserDto
 
 public class ResetPasswordDto
 {
+    [Required]
+    [StringLength(128, MinimumLength = 8)]
     public string NewPassword { get; set; } = string.Empty;
 }
 
 public class ChangePasswordDto
 {
+    [Required]
     public string CurrentPassword { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(128, MinimumLength = 8)]
     public string NewPassword { get; set; } = string.Empty;
 }
 

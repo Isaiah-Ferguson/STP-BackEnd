@@ -26,6 +26,7 @@ public class ScriptsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<ScriptDto>> Create([FromBody] CreateScriptDto dto)
     {
         var result = await _service.CreateAsync(dto);
@@ -33,6 +34,7 @@ public class ScriptsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<ScriptDto>> Update(Guid id, [FromBody] UpdateScriptDto dto)
     {
         var result = await _service.UpdateAsync(id, dto);

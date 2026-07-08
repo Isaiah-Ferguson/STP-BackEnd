@@ -18,7 +18,10 @@ public class ParticipantService : IParticipantService
         var programMap = programs.ToDictionary(p => p.Id, p => p.Name);
 
         var slugMap = programs.ToDictionary(p => p.Id, p => p.Slug);
-        return participants.Select(p => ToSummary(p, programMap, slugMap)).ToList();
+
+        // Attendance % is computed from real records (#8), not the stale seeded column.
+        var pctMap = AttendanceStats.PercentByParticipant(await _uow.Attendance.GetAllAsync());
+        return participants.Select(p => ToSummary(p, programMap, slugMap, pctMap)).ToList();
     }
 
     public async Task<ParticipantDetailDto?> GetByIdAsync(Guid id)
@@ -29,6 +32,8 @@ public class ParticipantService : IParticipantService
         var programs = await _uow.Programs.GetAllAsync();
         var prog = programs.FirstOrDefault(pr => pr.Id == p.ProgramId);
 
+        var records = await _uow.Attendance.ListAsync(r => r.ParticipantId == id);
+
         return new ParticipantDetailDto
         {
             Id = p.Id,
@@ -38,7 +43,7 @@ public class ParticipantService : IParticipantService
             ProgramId = p.ProgramId,
             ProgramName = prog?.Name ?? string.Empty,
             ProgramSlug = prog?.Slug ?? string.Empty,
-            AttendancePct = p.AttendancePct,
+            AttendancePct = AttendanceStats.PercentFor(records),
             StartDate = p.StartDate.ToString("yyyy-MM-dd"),
             HasDocAlerts = false,
             BirthYear = p.BirthYear,
@@ -98,7 +103,8 @@ public class ParticipantService : IParticipantService
     private static ParticipantSummaryDto ToSummary(
         Participant p,
         Dictionary<Guid, string> programMap,
-        Dictionary<Guid, string>? slugMap = null) =>
+        Dictionary<Guid, string>? slugMap = null,
+        Dictionary<Guid, int>? pctMap = null) =>
         new()
         {
             Id = p.Id,
@@ -108,7 +114,7 @@ public class ParticipantService : IParticipantService
             ProgramId = p.ProgramId,
             ProgramName = programMap.GetValueOrDefault(p.ProgramId, string.Empty),
             ProgramSlug = slugMap?.GetValueOrDefault(p.ProgramId, string.Empty) ?? string.Empty,
-            AttendancePct = p.AttendancePct,
+            AttendancePct = pctMap?.GetValueOrDefault(p.Id, 0) ?? p.AttendancePct,
             StartDate = p.StartDate.ToString("yyyy-MM-dd"),
             HasDocAlerts = false,
         };

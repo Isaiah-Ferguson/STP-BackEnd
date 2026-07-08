@@ -26,6 +26,7 @@ public class StaffController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<StaffDetailDto>> Create([FromBody] CreateStaffDto dto)
     {
         var result = await _service.CreateAsync(dto);
@@ -33,6 +34,7 @@ public class StaffController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<StaffDetailDto>> Update(Guid id, [FromBody] UpdateStaffDto dto)
     {
         var result = await _service.UpdateAsync(id, dto);

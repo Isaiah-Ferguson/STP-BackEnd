@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using CRM.API;
 using CRM.Application;
 using CRM.Application.Interfaces;
@@ -77,6 +78,25 @@ builder.Services.AddAuthorization(options =>
 });
 
 // ---------------------------------------------------------
+// Rate limiting (#7) — throttle login to blunt credential stuffing / brute force.
+// Partitioned by client IP: at most 10 login attempts per minute per address, no queue
+// (excess requests get 429). Applied to the login endpoint via the "login" policy.
+// ---------------------------------------------------------
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("login", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+            }));
+});
+
+// ---------------------------------------------------------
 // Swagger / OpenAPI
 // ---------------------------------------------------------
 builder.Services.AddEndpointsApiExplorer();
@@ -142,22 +162,42 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Always apply pending migrations on startup
+// Apply pending migrations on startup.
+// NOTE (#12): migrate-at-startup races across multiple instances and takes the app
+// down on a bad migration. Preferred long-term fix is to run `dotnet ef database update`
+// as a deployment step and remove this block. Kept for now so single-instance deploys
+// continue to migrate automatically.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
-    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-    await DataSeeder.SeedAsync(db);
+    // The Games Library is real reference data (the ~57 games from the programming
+    // calendar), so it is seeded in every environment. It is idempotent — it no-ops once
+    // any game exists.
     await DataSeeder.SeedGamesLibraryAsync(db);
-    await DataSeeder.SeedAdminUserAsync(db, hasher);
-    await DataSeeder.SeedSampleAttendanceAsync(db);
+
+    // The Script Library is kept populated in every environment so the Scripts page stays a
+    // working demo (#18, explicit client request). Idempotent — no-ops once any script exists.
+    await DataSeeder.SeedScriptsAsync(db);
+
+    // Demo data is DEVELOPMENT-ONLY. These seeders create demo participants/staff/attendance
+    // (#4) and default logins with the publicly-known password `ChangeMe!123` (#3). Running
+    // them in production once filled the live CRM with fake records ("Kezia Morales") and
+    // created takeover-able accounts.
+    if (app.Environment.IsDevelopment())
+    {
+        var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+        await DataSeeder.SeedAsync(db);
+        await DataSeeder.SeedAdminUserAsync(db, hasher);
+        await DataSeeder.SeedSampleAttendanceAsync(db);
+    }
 }
 
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors("FrontendPolicy");
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

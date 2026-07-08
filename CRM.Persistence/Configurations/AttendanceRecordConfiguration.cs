@@ -11,6 +11,10 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
         builder.HasKey(r => r.Id);
         builder.Property(r => r.Group).HasMaxLength(100);
 
+        // One attendance record per participant per session (#10) — collapses the
+        // check-then-insert race one level below the session race.
+        builder.HasIndex(r => new { r.SessionId, r.ParticipantId }).IsUnique();
+
         builder.HasOne(r => r.Participant)
                .WithMany(p => p.AttendanceRecords)
                .HasForeignKey(r => r.ParticipantId)

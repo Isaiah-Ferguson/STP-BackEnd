@@ -3,6 +3,7 @@ using CRM.Application.DTOs.Auth;
 using CRM.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace CRM.API.Controllers;
 
@@ -17,6 +18,7 @@ public class AuthController : ControllerBase
     /// <summary>Exchange email + password for a JWT.</summary>
     [HttpPost("login")]
     [AllowAnonymous]
+    [EnableRateLimiting("login")]
     public async Task<ActionResult<AuthResultDto>> Login([FromBody] LoginDto dto)
     {
         var result = await _service.LoginAsync(dto);
