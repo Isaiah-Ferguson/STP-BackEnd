@@ -9,6 +9,7 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
     public void Configure(EntityTypeBuilder<AttendanceRecord> builder)
     {
         builder.HasKey(r => r.Id);
+        builder.Property(r => r.RowVersion).IsRowVersion();
         builder.Property(r => r.Group).HasMaxLength(100);
 
         // One attendance record per participant per session (#10) — collapses the

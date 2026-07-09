@@ -43,6 +43,7 @@ public class UnitOfWork : IUnitOfWork
         Scripts = new GenericRepository<Script>(db);
         OnboardingItems = new GenericRepository<OnboardingItem>(db);
         Users = new GenericRepository<User>(db);
+        RefreshTokens = new GenericRepository<RefreshToken>(db);
     }
 
     public IRepository<Participant> Participants { get; }
@@ -77,6 +78,7 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<Script> Scripts { get; }
     public IRepository<OnboardingItem> OnboardingItems { get; }
     public IRepository<User> Users { get; }
+    public IRepository<RefreshToken> RefreshTokens { get; }
 
     public async Task<IReadOnlyList<StaffProgramAssignment>> GetStaffProgramAssignmentsAsync() =>
         await _db.Set<StaffProgramAssignment>().AsNoTracking().ToListAsync();

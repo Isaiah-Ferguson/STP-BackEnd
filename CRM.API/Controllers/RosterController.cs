@@ -32,7 +32,7 @@ public class RosterController : ControllerBase
     {
         if (year < 2020 || quarter < 1 || quarter > 4)
             return BadRequest("Provide a valid year and a quarter of 1–4.");
-        return Ok(await _service.GetMyStarsAsync(CurrentUserId(), year, quarter));
+        return Ok(await _service.GetMyStarsAsync(User.GetUserId(), year, quarter));
     }
 
     /// <summary>Creates or updates a participant's assignment for a term. Management only.</summary>
@@ -43,12 +43,5 @@ public class RosterController : ControllerBase
         if (dto.Year < 2020 || dto.Quarter < 1 || dto.Quarter > 4)
             return BadRequest("Provide a valid year and a quarter of 1–4.");
         return Ok(await _service.UpsertAssignmentAsync(dto));
-    }
-
-    private Guid CurrentUserId()
-    {
-        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
-                      ?? User.FindFirstValue("sub");
-        return Guid.TryParse(idClaim, out var id) ? id : Guid.Empty;
     }
 }

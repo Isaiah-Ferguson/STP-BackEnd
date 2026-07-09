@@ -19,9 +19,24 @@ public class ParticipantsController : ControllerBase
         _artsProfile = artsProfile;
     }
 
+    /// <summary>
+    /// Lists participants. Optional paging (#25): pass <c>?page=1&amp;pageSize=50</c>
+    /// (pageSize capped at 200) to get one page plus an <c>X-Total-Count</c> header;
+    /// omit both to get the full list (existing behavior).
+    /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ParticipantSummaryDto>>> GetAll() =>
-        Ok(await _service.GetAllAsync());
+    public async Task<ActionResult<IReadOnlyList<ParticipantSummaryDto>>> GetAll(
+        [FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken ct)
+    {
+        var all = await _service.GetAllAsync(ct);
+        if (page is null && pageSize is null) return Ok(all);
+
+        var size = Math.Clamp(pageSize ?? 50, 1, 200);
+        var pageNo = Math.Max(page ?? 1, 1);
+
+        Response.Headers["X-Total-Count"] = all.Count.ToString();
+        return Ok(all.Skip((pageNo - 1) * size).Take(size).ToList());
+    }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ParticipantDetailDto>> GetById(Guid id)

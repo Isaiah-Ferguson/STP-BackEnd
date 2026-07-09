@@ -19,8 +19,8 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
     public async Task<T?> GetByIdAsync(Guid id) =>
         await _set.FindAsync(id);
 
-    public async Task<IReadOnlyList<T>> GetAllAsync() =>
-        await _set.AsNoTracking().ToListAsync();
+    public async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken ct = default) =>
+        await _set.AsNoTracking().ToListAsync(ct);
 
     public async Task<IReadOnlyList<T>> ListAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken ct = default)
     {

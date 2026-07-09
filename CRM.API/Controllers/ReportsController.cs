@@ -16,5 +16,5 @@ public class ReportsController : ControllerBase
 
     /// <summary>The org-wide reporting snapshot in one request.</summary>
     [HttpGet]
-    public async Task<ActionResult<ReportsDto>> Get() => Ok(await _service.GetAsync());
+    public async Task<ActionResult<ReportsDto>> Get(CancellationToken ct) => Ok(await _service.GetAsync(ct));
 }

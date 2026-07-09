@@ -31,4 +31,14 @@ public static class AttendanceStats
     public static Dictionary<Guid, int> PercentByParticipant(IEnumerable<AttendanceRecord> records) =>
         records.GroupBy(r => r.ParticipantId)
                .ToDictionary(g => g.Key, g => PercentFor(g));
+
+    /// <summary>Percentage from pre-aggregated counts (#11) — same rounding as PercentFor.</summary>
+    public static int Percent(int present, int marked) =>
+        marked == 0 ? 0 : (int)Math.Round(100.0 * present / marked);
+
+    /// <summary>Builds participantId → attendance % from SQL-side aggregates (#11).</summary>
+    public static Dictionary<Guid, int> PercentByParticipant(IEnumerable<Interfaces.ParticipantAttendanceAgg> aggs) =>
+        aggs.ToDictionary(
+            a => a.ParticipantId,
+            a => Percent(a.PresentCount, a.PresentCount + a.AbsentCount));
 }

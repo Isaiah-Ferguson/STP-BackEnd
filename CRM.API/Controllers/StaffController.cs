@@ -15,8 +15,8 @@ public class StaffController : ControllerBase
     public StaffController(IStaffService service) => _service = service;
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<StaffSummaryDto>>> GetAll() =>
-        Ok(await _service.GetAllAsync());
+    public async Task<ActionResult<IReadOnlyList<StaffSummaryDto>>> GetAll(CancellationToken ct) =>
+        Ok(await _service.GetAllAsync(ct));
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<StaffDetailDto>> GetById(Guid id)

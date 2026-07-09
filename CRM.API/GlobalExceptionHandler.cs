@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CRM.API;
 
@@ -21,10 +22,17 @@ public class GlobalExceptionHandler : IExceptionHandler
         var (status, title) = exception switch
         {
             UnauthorizedAccessException => (StatusCodes.Status403Forbidden, "Forbidden"),
+            DbUpdateConcurrencyException => (StatusCodes.Status409Conflict, "Conflict"),
             InvalidOperationException => (StatusCodes.Status409Conflict, "Conflict"),
             KeyNotFoundException => (StatusCodes.Status404NotFound, "Not found"),
             _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred"),
         };
+
+        // RowVersion mismatch (#26): someone saved this row after we read it. EF's message
+        // is developer-speak, so substitute a user-facing one.
+        var detail = exception is DbUpdateConcurrencyException
+            ? "This item was changed by someone else while you were editing. Refresh and try again."
+            : exception.Message;
 
         if (status == StatusCodes.Status500InternalServerError)
             _logger.LogError(exception, "Unhandled exception for {Method} {Path}.",
@@ -39,7 +47,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             Status = status,
             Title = title,
             // Never leak internals on 500s; domain exception messages are user-facing.
-            Detail = status == StatusCodes.Status500InternalServerError ? null : exception.Message,
+            Detail = status == StatusCodes.Status500InternalServerError ? null : detail,
         }, cancellationToken);
 
         return true;

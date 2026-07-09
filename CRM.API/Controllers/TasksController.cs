@@ -18,7 +18,10 @@ public class TasksController : ControllerBase
     public async Task<ActionResult<IReadOnlyList<ProjectDto>>> GetProjects() =>
         Ok(await _service.GetProjectsAsync());
 
+    // Defining org initiatives (productions, compliance drives) is management work;
+    // adding/updating tasks within a project stays open to teachers (#6).
     [HttpPost("projects")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<ProjectDto>> CreateProject([FromBody] CreateProjectDto dto)
     {
         var result = await _service.CreateProjectAsync(dto);

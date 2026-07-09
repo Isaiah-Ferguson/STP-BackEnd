@@ -372,12 +372,12 @@ public class AttendanceService : IAttendanceService
             .ToList();
     }
 
-    public async Task<IReadOnlyList<AttendanceRosterEntryDto>> GetTodayRosterReadOnlyAsync()
+    public async Task<IReadOnlyList<AttendanceRosterEntryDto>> GetTodayRosterReadOnlyAsync(CancellationToken ct = default)
     {
         var today = DateTime.UtcNow.Date;
         var tomorrow = today.AddDays(1);
 
-        var todaySessions = await _uow.Sessions.ListAsync(s => s.Date >= today && s.Date < tomorrow);
+        var todaySessions = await _uow.Sessions.ListAsync(s => s.Date >= today && s.Date < tomorrow, ct);
         var sessionIds = todaySessions.Select(s => s.Id).ToHashSet();
         if (sessionIds.Count == 0) return new List<AttendanceRosterEntryDto>();
 

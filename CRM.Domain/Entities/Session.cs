@@ -15,6 +15,10 @@ public class Session : BaseEntity
     public SessionStatus Status { get; set; } = SessionStatus.Open;
     public DateTime? SubmittedAt { get; set; }
 
+    /// <summary>Optimistic-concurrency token (#26) — concurrent full-row updates now
+    /// surface as conflicts instead of silently overwriting each other.</summary>
+    public byte[] RowVersion { get; set; } = [];
+
     public CrmProgram Program { get; set; } = null!;
     public ICollection<AttendanceRecord> AttendanceRecords { get; set; } = new List<AttendanceRecord>();
 }

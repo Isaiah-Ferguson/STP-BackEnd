@@ -8,28 +8,34 @@ namespace CRM.Application.Services;
 public class ReportsService : IReportsService
 {
     private readonly IUnitOfWork _uow;
+    private readonly IStatsQueries _stats;
 
-    public ReportsService(IUnitOfWork uow) => _uow = uow;
-
-    public async Task<ReportsDto> GetAsync()
+    public ReportsService(IUnitOfWork uow, IStatsQueries stats)
     {
-        // Each table loaded once, aggregated in memory.
-        var participants = await _uow.Participants.GetAllAsync();
-        var programs = await _uow.Programs.GetAllAsync();
-        var staff = await _uow.Staff.GetAllAsync();
-        var sessions = await _uow.Sessions.GetAllAsync();
-        var records = await _uow.Attendance.GetAllAsync();
-        var tasks = await _uow.Tasks.GetAllAsync();
+        _uow = uow;
+        _stats = stats;
+    }
 
-        // Real per-participant attendance % (#8), computed from the records already loaded.
-        var pctMap = AttendanceStats.PercentByParticipant(records);
+    public async Task<ReportsDto> GetAsync(CancellationToken ct = default)
+    {
+        // Bounded tables (participants, programs, staff, tasks) load once; the unbounded
+        // ones (attendance records, sessions) arrive as SQL aggregates (#11) — this
+        // endpoint no longer scales with the size of the attendance ledger.
+        var participants = await _uow.Participants.GetAllAsync(ct);
+        var programs = await _uow.Programs.GetAllAsync(ct);
+        var staff = await _uow.Staff.GetAllAsync(ct);
+        var tasks = await _uow.Tasks.GetAllAsync(ct);
+
+        var attendanceAgg = await _stats.GetParticipantAttendanceAsync(ct);
+        var attendanceTotals = await _stats.GetAttendanceStatusTotalsAsync(ct);
+        var sessionCountByProgram = await _stats.GetSessionCountByProgramAsync(ct);
+
+        // Real per-participant attendance % (#8), from the SQL-side aggregates.
+        var pctMap = AttendanceStats.PercentByParticipant(attendanceAgg);
 
         var ptsByProgram = participants
             .GroupBy(p => p.ProgramId)
             .ToDictionary(g => g.Key, g => g.ToList());
-        var sessionCountByProgram = sessions
-            .GroupBy(s => s.ProgramId)
-            .ToDictionary(g => g.Key, g => g.Count());
 
         var programReports = programs
             .Select(p =>
@@ -46,10 +52,6 @@ public class ReportsService : IReportsService
             })
             .OrderBy(p => p.Name)
             .ToList();
-
-        var present = records.Count(r => r.Status == AttendanceStatus.Present);
-        var absent = records.Count(r => r.Status == AttendanceStatus.Absent);
-        var unmarked = records.Count(r => r.Status == AttendanceStatus.Unmarked);
 
         var totals = new ReportTotalsDto
         {
@@ -79,11 +81,12 @@ public class ReportsService : IReportsService
             StaffOnboarding = staffOnboarding,
             Attendance = new AttendanceSummaryDto
             {
-                Sessions = sessions.Count,
-                Present = present,
-                Absent = absent,
-                Unmarked = unmarked,
-                PresentRatePct = (present + absent) > 0 ? (int)Math.Round(100.0 * present / (present + absent)) : 0,
+                Sessions = attendanceTotals.SessionCount,
+                Present = attendanceTotals.Present,
+                Absent = attendanceTotals.Absent,
+                Unmarked = attendanceTotals.Unmarked,
+                PresentRatePct = AttendanceStats.Percent(
+                    attendanceTotals.Present, attendanceTotals.Present + attendanceTotals.Absent),
             },
         };
     }

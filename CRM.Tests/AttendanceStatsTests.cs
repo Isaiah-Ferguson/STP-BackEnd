@@ -1,3 +1,4 @@
+using CRM.Application.Interfaces;
 using CRM.Application.Services;
 using CRM.Domain.Entities;
 using CRM.Domain.Enums;
@@ -86,6 +87,25 @@ public class AttendanceStatsTests
     [Fact]
     public void PercentByParticipant_EmptyInput_EmptyMap()
     {
-        Assert.Empty(AttendanceStats.PercentByParticipant([]));
+        Assert.Empty(AttendanceStats.PercentByParticipant(Array.Empty<AttendanceRecord>()));
+    }
+
+    [Fact]
+    public void PercentByParticipant_FromAggregates_MatchesRecordMath()
+    {
+        var alice = Guid.NewGuid();
+        var aggs = new[] { new ParticipantAttendanceAgg(alice, Guid.NewGuid(), PresentCount: 2, AbsentCount: 1) };
+
+        // 2/3 → 67, same rounding as the record-based overload.
+        Assert.Equal(67, AttendanceStats.PercentByParticipant(aggs)[alice]);
+    }
+
+    [Theory]
+    [InlineData(0, 0, 0)]
+    [InlineData(3, 4, 75)]
+    [InlineData(1, 3, 33)]
+    public void Percent_FromCounts(int present, int marked, int expected)
+    {
+        Assert.Equal(expected, AttendanceStats.Percent(present, marked));
     }
 }

@@ -11,26 +11,27 @@ namespace CRM.Application.Services;
 public class ProgramService : IProgramService
 {
     private readonly IUnitOfWork _uow;
+    private readonly IStatsQueries _stats;
 
-    public ProgramService(IUnitOfWork uow) => _uow = uow;
-
-    public async Task<IReadOnlyList<ProgramSummaryDto>> GetAllAsync()
+    public ProgramService(IUnitOfWork uow, IStatsQueries stats)
     {
-        var programs = await _uow.Programs.GetAllAsync();
-        var participants = await _uow.Participants.GetAllAsync();
-        var sessions = await _uow.Sessions.GetAllAsync();
+        _uow = uow;
+        _stats = stats;
+    }
 
-        // Attendance % is computed from real records (#8), not the stale seeded column.
-        var pctMap = AttendanceStats.PercentByParticipant(await _uow.Attendance.GetAllAsync());
+    public async Task<IReadOnlyList<ProgramSummaryDto>> GetAllAsync(CancellationToken ct = default)
+    {
+        var programs = await _uow.Programs.GetAllAsync(ct);
+        var participants = await _uow.Participants.GetAllAsync(ct);
+
+        // Attendance % from SQL aggregates (#8/#11); next session per program is a single
+        // grouped query instead of loading every session ever created.
+        var pctMap = AttendanceStats.PercentByParticipant(await _stats.GetParticipantAttendanceAsync(ct));
+        var nextByProgram = await _stats.GetNextSessionByProgramAsync(DateTime.UtcNow, ct);
 
         var ptsByProgram = participants
             .GroupBy(p => p.ProgramId)
             .ToDictionary(g => g.Key, g => g.ToList());
-
-        var nextByProgram = sessions
-            .Where(s => s.Date >= DateTime.UtcNow)
-            .GroupBy(s => s.ProgramId)
-            .ToDictionary(g => g.Key, g => g.MinBy(s => s.Date));
 
         return programs.Select(p =>
         {
@@ -56,9 +57,9 @@ public class ProgramService : IProgramService
         }).ToList();
     }
 
-    public async Task<IReadOnlyList<ProgramSummaryDto>> GetForUserAsync(Guid userId)
+    public async Task<IReadOnlyList<ProgramSummaryDto>> GetForUserAsync(Guid userId, CancellationToken ct = default)
     {
-        var all = await GetAllAsync();
+        var all = await GetAllAsync(ct);
         var user = await _uow.Users.GetByIdAsync(userId);
         if (user is null) return new List<ProgramSummaryDto>();
         if (user.Role == Domain.Enums.UserRole.Admin) return all;
@@ -81,11 +82,8 @@ public class ProgramService : IProgramService
         var program = programs.FirstOrDefault(p => p.Slug == slug);
         if (program is null) return null;
 
-        var participants = (await _uow.Participants.GetAllAsync())
-            .Where(p => p.ProgramId == program.Id).ToList();
-
-        var sessions = (await _uow.Sessions.GetAllAsync())
-            .Where(s => s.ProgramId == program.Id).ToList();
+        // Filter in SQL (#11), not after loading the whole table.
+        var participants = (await _uow.Participants.ListAsync(p => p.ProgramId == program.Id)).ToList();
 
         // Real per-participant attendance % (#8), scoped to this program's participants.
         var participantIds = participants.Select(p => p.Id).ToHashSet();

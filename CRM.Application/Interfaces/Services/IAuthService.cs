@@ -4,8 +4,21 @@ namespace CRM.Application.Interfaces.Services;
 
 public interface IAuthService
 {
-    /// <summary>Validates credentials and returns a token, or null if they are invalid / inactive.</summary>
-    Task<AuthResultDto?> LoginAsync(LoginDto dto);
+    /// <summary>
+    /// Validates credentials and returns a full session (JWT + rotating refresh token),
+    /// or null if they are invalid / inactive.
+    /// </summary>
+    Task<AuthSessionDto?> LoginAsync(LoginDto dto);
+
+    /// <summary>
+    /// Exchanges a valid refresh token for a new session, rotating the token (the old one
+    /// is revoked). Returns null if the token is unknown, expired, revoked, or the user is
+    /// inactive (#17/#20).
+    /// </summary>
+    Task<AuthSessionDto?> RefreshAsync(string refreshToken);
+
+    /// <summary>Revokes a refresh token (sign-out). Unknown tokens are ignored.</summary>
+    Task LogoutAsync(string refreshToken);
 
     /// <summary>Creates a new user. Throws InvalidOperationException if the email is already taken.</summary>
     Task<UserDto> RegisterAsync(RegisterUserDto dto);

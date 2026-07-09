@@ -73,6 +73,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         // Check IsActive on every authenticated request — one indexed PK lookup.
         options.Events = new JwtBearerEvents
         {
+            // #15: the JWT normally arrives in an httpOnly cookie. The Authorization
+            // header still wins when present (Swagger, scripts, older frontend builds).
+            OnMessageReceived = ctx =>
+            {
+                if (string.IsNullOrEmpty(ctx.Token)
+                    && !ctx.Request.Headers.ContainsKey("Authorization")
+                    && ctx.Request.Cookies.TryGetValue(CRM.API.Controllers.AuthController.AccessCookie, out var cookieToken))
+                {
+                    ctx.Token = cookieToken;
+                }
+                return Task.CompletedTask;
+            },
+
             OnTokenValidated = async ctx =>
             {
                 var idClaim = ctx.Principal?.FindFirst("sub")?.Value

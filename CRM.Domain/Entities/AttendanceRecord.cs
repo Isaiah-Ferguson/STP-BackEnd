@@ -10,6 +10,10 @@ public class AttendanceRecord : BaseEntity
     public AttendanceStatus Status { get; set; } = AttendanceStatus.Unmarked;
     public string? Group { get; set; }
 
+    /// <summary>Optimistic-concurrency token (#26) — concurrent full-row updates now
+    /// surface as conflicts instead of silently overwriting each other.</summary>
+    public byte[] RowVersion { get; set; } = [];
+
     public Participant Participant { get; set; } = null!;
     public Session Session { get; set; } = null!;
     public ICollection<AttendanceNote> Notes { get; set; } = new List<AttendanceNote>();

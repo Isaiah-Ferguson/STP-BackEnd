@@ -27,6 +27,10 @@ public class MonthlyProgressSnapshot : BaseEntity
     public bool IsConfirmed { get; set; }
     public Guid? ConfirmedByStaffMemberId { get; set; }
 
+    /// <summary>Optimistic-concurrency token (#26) — concurrent full-row updates now
+    /// surface as conflicts instead of silently overwriting each other.</summary>
+    public byte[] RowVersion { get; set; } = [];
+
     public Participant? Participant { get; set; }
     public SubSkill? SubSkill { get; set; }
 }

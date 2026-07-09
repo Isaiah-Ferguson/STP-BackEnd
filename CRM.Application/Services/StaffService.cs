@@ -11,10 +11,10 @@ public class StaffService : IStaffService
 
     public StaffService(IUnitOfWork uow) => _uow = uow;
 
-    public async Task<IReadOnlyList<StaffSummaryDto>> GetAllAsync()
+    public async Task<IReadOnlyList<StaffSummaryDto>> GetAllAsync(CancellationToken ct = default)
     {
-        var staff = await _uow.Staff.GetAllAsync();
-        var programs = await _uow.Programs.GetAllAsync();
+        var staff = await _uow.Staff.GetAllAsync(ct);
+        var programs = await _uow.Programs.GetAllAsync(ct);
         var assignments = await _uow.GetStaffProgramAssignmentsAsync();
 
         var programMap = programs.ToDictionary(p => p.Id, p => p.Name);

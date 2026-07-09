@@ -34,7 +34,7 @@ public class AttendanceController : ControllerBase
     public async Task<ActionResult<IReadOnlyList<ScheduledSessionDto>>> GetScheduled([FromQuery] DateTime? date)
     {
         var when = date?.Date ?? DateTime.UtcNow.Date;
-        return Ok(await _service.GetScheduledForUserAsync(CurrentUserId(), when));
+        return Ok(await _service.GetScheduledForUserAsync(User.GetUserId(), when));
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public class AttendanceController : ControllerBase
         var when = date?.Date ?? DateTime.UtcNow.Date;
         try
         {
-            var roster = await _service.GetProgramSessionReadOnlyAsync(CurrentUserId(), programId, when);
+            var roster = await _service.GetProgramSessionReadOnlyAsync(User.GetUserId(), programId, when);
             return roster is null ? NotFound() : Ok(roster);
         }
         catch (UnauthorizedAccessException ex)
@@ -64,7 +64,7 @@ public class AttendanceController : ControllerBase
         var when = dto.Date?.Date ?? DateTime.UtcNow.Date;
         try
         {
-            var roster = await _service.GetOrCreateSessionAsync(CurrentUserId(), dto.ProgramId, when);
+            var roster = await _service.GetOrCreateSessionAsync(User.GetUserId(), dto.ProgramId, when);
             return roster is null ? NotFound() : Ok(roster);
         }
         catch (UnauthorizedAccessException ex)
@@ -79,7 +79,7 @@ public class AttendanceController : ControllerBase
     {
         try
         {
-            var result = await _service.GetSessionAsync(CurrentUserId(), sessionId);
+            var result = await _service.GetSessionAsync(User.GetUserId(), sessionId);
             return result is null ? NotFound() : Ok(result);
         }
         catch (UnauthorizedAccessException ex)
@@ -94,7 +94,7 @@ public class AttendanceController : ControllerBase
     {
         try
         {
-            var ok = await _service.SubmitSessionAsync(CurrentUserId(), sessionId);
+            var ok = await _service.SubmitSessionAsync(User.GetUserId(), sessionId);
             return ok ? NoContent() : NotFound();
         }
         catch (UnauthorizedAccessException ex)
@@ -108,7 +108,7 @@ public class AttendanceController : ControllerBase
     {
         try
         {
-            var updated = await _service.UpdateRecordAsync(CurrentUserId(), recordId, dto);
+            var updated = await _service.UpdateRecordAsync(User.GetUserId(), recordId, dto);
             return updated ? NoContent() : NotFound();
         }
         catch (UnauthorizedAccessException ex)
@@ -126,19 +126,12 @@ public class AttendanceController : ControllerBase
     {
         try
         {
-            var note = await _service.AddNoteAsync(CurrentUserId(), recordId, dto);
+            var note = await _service.AddNoteAsync(User.GetUserId(), recordId, dto);
             return note is null ? NotFound() : Ok(note);
         }
         catch (UnauthorizedAccessException ex)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
         }
-    }
-
-    private Guid CurrentUserId()
-    {
-        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
-                      ?? User.FindFirstValue("sub");
-        return Guid.TryParse(idClaim, out var id) ? id : Guid.Empty;
     }
 }

@@ -20,6 +20,10 @@ public class User : BaseEntity
 
     public DateTime? LastLoginAt { get; set; }
 
+    /// <summary>Optimistic-concurrency token (#26) — concurrent full-row updates now
+    /// surface as conflicts instead of silently overwriting each other.</summary>
+    public byte[] RowVersion { get; set; } = [];
+
     /// <summary>Optional link to a staff record. Admins need not be staff.</summary>
     public Guid? StaffMemberId { get; set; }
     public StaffMember? StaffMember { get; set; }

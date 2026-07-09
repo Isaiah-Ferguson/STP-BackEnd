@@ -25,7 +25,9 @@ public class CalendarController : ControllerBase
         return Ok(await _service.GetEventsAsync(month, year));
     }
 
+    // Org calendar planning is a management action; teachers are read-only here (#6).
     [HttpPost("events")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<CalendarEventDto>> CreateEvent([FromBody] CreateCalendarEventDto dto)
     {
         var result = await _service.CreateEventAsync(dto);

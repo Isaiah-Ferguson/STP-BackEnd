@@ -5,5 +5,5 @@ namespace CRM.Application.Interfaces.Services;
 public interface IDashboardService
 {
     /// <summary>Composes the full dashboard payload in a single call.</summary>
-    Task<DashboardDto> GetAsync();
+    Task<DashboardDto> GetAsync(CancellationToken ct = default);
 }

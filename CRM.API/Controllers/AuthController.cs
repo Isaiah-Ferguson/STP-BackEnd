@@ -11,20 +11,101 @@ namespace CRM.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
+    /// <summary>Cookie holding the short-lived JWT (#15). httpOnly — invisible to XSS.</summary>
+    public const string AccessCookie = "ss_access";
+    /// <summary>Cookie holding the rotating refresh token (#17).</summary>
+    public const string RefreshCookie = "ss_refresh";
+
     private readonly IAuthService _service;
+    private readonly IWebHostEnvironment _env;
 
-    public AuthController(IAuthService service) => _service = service;
+    public AuthController(IAuthService service, IWebHostEnvironment env)
+    {
+        _service = service;
+        _env = env;
+    }
 
-    /// <summary>Exchange email + password for a JWT.</summary>
+    /// <summary>
+    /// Exchange email + password for a session. Credentials are delivered as httpOnly
+    /// cookies; the body still includes the JWT for API clients (Swagger, scripts) and
+    /// older frontend builds.
+    /// </summary>
     [HttpPost("login")]
     [AllowAnonymous]
     [EnableRateLimiting("login")]
     public async Task<ActionResult<AuthResultDto>> Login([FromBody] LoginDto dto)
     {
-        var result = await _service.LoginAsync(dto);
-        return result is null
-            ? Unauthorized(new { message = "Invalid email or password." })
-            : Ok(result);
+        var session = await _service.LoginAsync(dto);
+        if (session is null)
+            return Unauthorized(new { message = "Invalid email or password." });
+
+        SetAuthCookies(session);
+        return Ok(session.Auth);
+    }
+
+    /// <summary>
+    /// Exchanges the refresh cookie for a new JWT + rotated refresh token (#17).
+    /// 401 when the cookie is missing/expired/revoked — the client should re-login.
+    /// </summary>
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    [EnableRateLimiting("login")]
+    public async Task<ActionResult<AuthResultDto>> Refresh()
+    {
+        var raw = Request.Cookies[RefreshCookie];
+        var session = raw is null ? null : await _service.RefreshAsync(raw);
+        if (session is null)
+        {
+            ClearAuthCookies();
+            return Unauthorized(new { message = "Session expired. Please sign in again." });
+        }
+
+        SetAuthCookies(session);
+        return Ok(session.Auth);
+    }
+
+    /// <summary>Revokes the refresh token and clears both auth cookies.</summary>
+    [HttpPost("logout")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Logout()
+    {
+        if (Request.Cookies[RefreshCookie] is { } raw)
+            await _service.LogoutAsync(raw);
+
+        ClearAuthCookies();
+        return NoContent();
+    }
+
+    private void SetAuthCookies(AuthSessionDto session)
+    {
+        // SameSite=Lax works because the frontend proxies API calls through its own
+        // origin (Next.js rewrite), making these first-party cookies. Secure is relaxed
+        // only for local http development.
+        var secure = !_env.IsDevelopment();
+        Response.Cookies.Append(AccessCookie, session.Auth.Token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = secure,
+            SameSite = SameSiteMode.Lax,
+            Path = "/",
+            // Outlives the JWT inside it so an expired JWT still reaches the server
+            // and 401s, which is the frontend's cue to call refresh.
+            Expires = session.RefreshExpiresAt,
+        });
+        Response.Cookies.Append(RefreshCookie, session.RefreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = secure,
+            SameSite = SameSiteMode.Lax,
+            Path = "/",
+            Expires = session.RefreshExpiresAt,
+        });
+    }
+
+    private void ClearAuthCookies()
+    {
+        Response.Cookies.Delete(AccessCookie, new CookieOptions { Path = "/" });
+        Response.Cookies.Delete(RefreshCookie, new CookieOptions { Path = "/" });
     }
 
     /// <summary>Returns the currently authenticated user.</summary>
@@ -70,7 +151,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var updated = await _service.UpdateUserAsync(id, dto, CurrentUserId());
+            var updated = await _service.UpdateUserAsync(id, dto, User.GetUserId());
             return updated is null ? NotFound() : Ok(updated);
         }
         catch (InvalidOperationException ex)
@@ -102,7 +183,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var ok = await _service.ChangePasswordAsync(CurrentUserId(), dto);
+            var ok = await _service.ChangePasswordAsync(User.GetUserId(), dto);
             return ok ? NoContent() : Unauthorized();
         }
         catch (InvalidOperationException ex)
@@ -118,19 +199,12 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var ok = await _service.DeleteUserAsync(id, CurrentUserId());
+            var ok = await _service.DeleteUserAsync(id, User.GetUserId());
             return ok ? NoContent() : NotFound();
         }
         catch (InvalidOperationException ex)
         {
             return Conflict(new { message = ex.Message });
         }
-    }
-
-    private Guid CurrentUserId()
-    {
-        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
-                      ?? User.FindFirstValue("sub");
-        return Guid.TryParse(idClaim, out var id) ? id : Guid.Empty;
     }
 }

@@ -76,3 +76,15 @@ public class AuthResultDto
     public DateTime ExpiresAt { get; set; }
     public UserDto User { get; set; } = new();
 }
+
+/// <summary>
+/// A full sign-in session: the JWT result plus the rotating refresh token (#15/#17).
+/// The controller moves both credentials into httpOnly cookies; the refresh token must
+/// never appear in a response body.
+/// </summary>
+public class AuthSessionDto
+{
+    public AuthResultDto Auth { get; set; } = new();
+    public string RefreshToken { get; set; } = string.Empty;
+    public DateTime RefreshExpiresAt { get; set; }
+}

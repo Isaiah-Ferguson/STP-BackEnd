@@ -9,6 +9,7 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
     public void Configure(EntityTypeBuilder<Session> builder)
     {
         builder.HasKey(s => s.Id);
+        builder.Property(s => s.RowVersion).IsRowVersion();
         builder.Property(s => s.Room).HasMaxLength(100);
         builder.Property(s => s.TimeRange).HasMaxLength(50);
         builder.Property(s => s.Label).HasMaxLength(200);

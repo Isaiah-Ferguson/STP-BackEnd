@@ -9,6 +9,7 @@ public class MonthlyProgressSnapshotConfiguration : IEntityTypeConfiguration<Mon
     public void Configure(EntityTypeBuilder<MonthlyProgressSnapshot> builder)
     {
         builder.HasKey(s => s.Id);
+        builder.Property(s => s.RowVersion).IsRowVersion();
         builder.Property(s => s.MonthKey).IsRequired().HasMaxLength(7);
 
         // One snapshot per participant per skill per month.

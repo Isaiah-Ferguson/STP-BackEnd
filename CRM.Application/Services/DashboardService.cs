@@ -28,7 +28,7 @@ public class DashboardService : IDashboardService
         _calendar = calendar;
     }
 
-    public async Task<DashboardDto> GetAsync()
+    public async Task<DashboardDto> GetAsync(CancellationToken ct = default)
     {
         // Runs sequentially on a single DbContext (EF contexts aren't concurrent), but
         // collapses seven HTTP round-trips into one and uses the read-only roster so the
@@ -36,13 +36,13 @@ public class DashboardService : IDashboardService
         var now = DateTime.UtcNow;
         var next = now.AddMonths(1);
 
-        var participants = await _participants.GetAllAsync();
-        var roster = await _attendance.GetTodayRosterReadOnlyAsync();
-        var projects = await _tasks.GetProjectsAsync();
-        var staff = await _staff.GetAllAsync();
-        var programs = await _programs.GetAllAsync();
-        var thisMonth = await _calendar.GetEventsAsync(now.Month, now.Year);
-        var nextMonth = await _calendar.GetEventsAsync(next.Month, next.Year);
+        var participants = await _participants.GetAllAsync(ct);
+        var roster = await _attendance.GetTodayRosterReadOnlyAsync(ct);
+        var projects = await _tasks.GetProjectsAsync(ct);
+        var staff = await _staff.GetAllAsync(ct);
+        var programs = await _programs.GetAllAsync(ct);
+        var thisMonth = await _calendar.GetEventsAsync(now.Month, now.Year, ct);
+        var nextMonth = await _calendar.GetEventsAsync(next.Month, next.Year, ct);
 
         return new DashboardDto
         {

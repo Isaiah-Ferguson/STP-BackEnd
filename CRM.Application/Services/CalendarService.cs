@@ -11,10 +11,10 @@ public class CalendarService : ICalendarService
 
     public CalendarService(IUnitOfWork uow) => _uow = uow;
 
-    public async Task<IReadOnlyList<CalendarEventDto>> GetEventsAsync(int month, int year)
+    public async Task<IReadOnlyList<CalendarEventDto>> GetEventsAsync(int month, int year, CancellationToken ct = default)
     {
-        var events = await _uow.CalendarEvents.GetAllAsync();
-        var programs = await _uow.Programs.GetAllAsync();
+        var events = await _uow.CalendarEvents.GetAllAsync(ct);
+        var programs = await _uow.Programs.GetAllAsync(ct);
         var programMap = programs.ToDictionary(p => p.Id, p => p.Name);
 
         return events

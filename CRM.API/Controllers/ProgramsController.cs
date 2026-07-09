@@ -16,13 +16,13 @@ public class ProgramsController : ControllerBase
     public ProgramsController(IProgramService service) => _service = service;
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ProgramSummaryDto>>> GetAll() =>
-        Ok(await _service.GetAllAsync());
+    public async Task<ActionResult<IReadOnlyList<ProgramSummaryDto>>> GetAll(CancellationToken ct) =>
+        Ok(await _service.GetAllAsync(ct));
 
     /// <summary>The caller's in-scope programs (all for an Admin; assigned programs for staff). Literal route wins over {slug}.</summary>
     [HttpGet("mine")]
-    public async Task<ActionResult<IReadOnlyList<ProgramSummaryDto>>> GetMine() =>
-        Ok(await _service.GetForUserAsync(CurrentUserId()));
+    public async Task<ActionResult<IReadOnlyList<ProgramSummaryDto>>> GetMine(CancellationToken ct) =>
+        Ok(await _service.GetForUserAsync(User.GetUserId(), ct));
 
     [HttpGet("{slug}")]
     public async Task<ActionResult<ProgramSummaryDto>> GetBySlug(string slug)
@@ -52,11 +52,5 @@ public class ProgramsController : ControllerBase
     {
         var result = await _service.UpdateAsync(id, dto);
         return result is null ? NotFound() : Ok(result);
-    }
-
-    private Guid CurrentUserId()
-    {
-        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-        return Guid.TryParse(idClaim, out var id) ? id : Guid.Empty;
     }
 }

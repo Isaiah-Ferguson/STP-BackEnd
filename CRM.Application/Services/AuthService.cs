@@ -22,7 +22,7 @@ public class AuthService : IAuthService
         _logger = logger;
     }
 
-    public async Task<AuthResultDto?> LoginAsync(LoginDto dto)
+    public async Task<AuthSessionDto?> LoginAsync(LoginDto dto)
     {
         var email = dto.Email.Trim().ToLowerInvariant();
         var user = await _uow.Users.FirstOrDefaultAsync(u => u.Email == email);
@@ -46,22 +46,89 @@ public class AuthService : IAuthService
 
         user.LastLoginAt = DateTime.UtcNow;
         await _uow.Users.UpdateAsync(user);
-        await _uow.SaveChangesAsync();
 
+        var session = await CreateSessionAsync(user);
+        _logger.LogInformation("User {UserId} logged in.", user.Id);
+        return session;
+    }
+
+    public async Task<AuthSessionDto?> RefreshAsync(string refreshToken)
+    {
+        if (string.IsNullOrWhiteSpace(refreshToken)) return null;
+
+        var hash = HashRefreshToken(refreshToken);
+        var stored = await _uow.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == hash);
+        if (stored is null || !stored.IsActive)
+        {
+            _logger.LogWarning("Refresh rejected: token unknown, expired, or already used.");
+            return null;
+        }
+
+        var user = await _uow.Users.GetByIdAsync(stored.UserId);
+        if (user is null || !user.IsActive)
+        {
+            _logger.LogWarning("Refresh rejected for user {UserId}: account inactive.", stored.UserId);
+            return null;
+        }
+
+        // Rotation: this token is single-use. Revoking before reissue means a replayed
+        // (stolen) token fails loudly instead of silently minting sessions.
+        stored.RevokedAt = DateTime.UtcNow;
+        await _uow.RefreshTokens.UpdateAsync(stored);
+
+        return await CreateSessionAsync(user);
+    }
+
+    public async Task LogoutAsync(string refreshToken)
+    {
+        if (string.IsNullOrWhiteSpace(refreshToken)) return;
+
+        var hash = HashRefreshToken(refreshToken);
+        var stored = await _uow.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == hash);
+        if (stored is null || stored.RevokedAt is not null) return;
+
+        stored.RevokedAt = DateTime.UtcNow;
+        await _uow.RefreshTokens.UpdateAsync(stored);
+        await _uow.SaveChangesAsync();
+        _logger.LogInformation("User {UserId} logged out.", stored.UserId);
+    }
+
+    private const int RefreshTokenDays = 14;
+
+    /// <summary>Mints a JWT + fresh refresh token for the user and persists pending changes.</summary>
+    private async Task<AuthSessionDto> CreateSessionAsync(User user)
+    {
         // Include the linked staff role so management-write policies can allow Coordinators.
         StaffRole? staffRole = user.StaffMemberId is { } sid
             ? (await _uow.Staff.GetByIdAsync(sid))?.Role
             : null;
 
         var (token, expiresAt) = _tokens.CreateToken(user, staffRole);
-        _logger.LogInformation("User {UserId} logged in.", user.Id);
-        return new AuthResultDto
+
+        var raw = GenerateRefreshToken();
+        var refresh = new RefreshToken
         {
-            Token = token,
-            ExpiresAt = expiresAt,
-            User = ToDto(user),
+            UserId = user.Id,
+            TokenHash = HashRefreshToken(raw),
+            ExpiresAt = DateTime.UtcNow.AddDays(RefreshTokenDays),
+        };
+        await _uow.RefreshTokens.AddAsync(refresh);
+        await _uow.SaveChangesAsync();
+
+        return new AuthSessionDto
+        {
+            Auth = new AuthResultDto { Token = token, ExpiresAt = expiresAt, User = ToDto(user) },
+            RefreshToken = raw,
+            RefreshExpiresAt = refresh.ExpiresAt,
         };
     }
+
+    private static string GenerateRefreshToken() =>
+        Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(48));
+
+    private static string HashRefreshToken(string raw) =>
+        Convert.ToBase64String(
+            System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(raw)));
 
     private const int MinPasswordLength = 8;
 

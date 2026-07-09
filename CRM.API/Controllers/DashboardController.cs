@@ -16,5 +16,5 @@ public class DashboardController : ControllerBase
 
     /// <summary>The full dashboard payload in one request.</summary>
     [HttpGet]
-    public async Task<ActionResult<DashboardDto>> Get() => Ok(await _service.GetAsync());
+    public async Task<ActionResult<DashboardDto>> Get(CancellationToken ct) => Ok(await _service.GetAsync(ct));
 }

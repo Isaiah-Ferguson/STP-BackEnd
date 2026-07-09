@@ -58,7 +58,7 @@ public interface IAttendanceService
     /// Returns an empty list if no session exists for today. Intended for read-only views
     /// like the dashboard.
     /// </summary>
-    Task<IReadOnlyList<AttendanceRosterEntryDto>> GetTodayRosterReadOnlyAsync();
+    Task<IReadOnlyList<AttendanceRosterEntryDto>> GetTodayRosterReadOnlyAsync(CancellationToken ct = default);
 
     /// <summary>
     /// Adds a note to an attendance record. Returns null if the record is not found; throws

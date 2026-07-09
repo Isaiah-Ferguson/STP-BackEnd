@@ -11,11 +11,11 @@ public class TaskService : ITaskService
 
     public TaskService(IUnitOfWork uow) => _uow = uow;
 
-    public async Task<IReadOnlyList<ProjectDto>> GetProjectsAsync()
+    public async Task<IReadOnlyList<ProjectDto>> GetProjectsAsync(CancellationToken ct = default)
     {
-        var projects = await _uow.Projects.GetAllAsync();
-        var tasks = await _uow.Tasks.GetAllAsync();
-        var staff = await _uow.Staff.GetAllAsync();
+        var projects = await _uow.Projects.GetAllAsync(ct);
+        var tasks = await _uow.Tasks.GetAllAsync(ct);
+        var staff = await _uow.Staff.GetAllAsync(ct);
         var staffMap = staff.ToDictionary(s => s.Id);
         var tasksByProject = tasks.GroupBy(t => t.ProjectId).ToDictionary(g => g.Key, g => g.ToList());
 

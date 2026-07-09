@@ -24,7 +24,11 @@ public class GameBacklogController : ControllerBase
         return Ok(await _service.CreateIdeaAsync(dto));
     }
 
+    // Promoting an idea writes into the official Games Library, whose create/update
+    // endpoints are ManagementWrite — promote must match or it's a bypass (#6).
+    // Proposing ideas and age-mods stays open to teachers.
     [HttpPost("ideas/{id:guid}/promote")]
+    [Authorize(Policy = "ManagementWrite")]
     public async Task<ActionResult<GameIdeaDto>> Promote(Guid id)
     {
         var result = await _service.PromoteIdeaAsync(id);

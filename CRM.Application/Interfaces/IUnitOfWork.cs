@@ -38,6 +38,7 @@ public interface IUnitOfWork
     IRepository<Script> Scripts { get; }
     IRepository<OnboardingItem> OnboardingItems { get; }
     IRepository<User> Users { get; }
+    IRepository<RefreshToken> RefreshTokens { get; }
 
     // StaffProgramAssignment has a composite PK and does not extend BaseEntity,
     // so it is exposed via dedicated methods rather than a generic repository.

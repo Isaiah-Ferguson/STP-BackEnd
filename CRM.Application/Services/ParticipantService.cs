@@ -8,19 +8,24 @@ namespace CRM.Application.Services;
 public class ParticipantService : IParticipantService
 {
     private readonly IUnitOfWork _uow;
+    private readonly IStatsQueries _stats;
 
-    public ParticipantService(IUnitOfWork uow) => _uow = uow;
-
-    public async Task<IReadOnlyList<ParticipantSummaryDto>> GetAllAsync()
+    public ParticipantService(IUnitOfWork uow, IStatsQueries stats)
     {
-        var participants = await _uow.Participants.GetAllAsync();
-        var programs = await _uow.Programs.GetAllAsync();
+        _uow = uow;
+        _stats = stats;
+    }
+
+    public async Task<IReadOnlyList<ParticipantSummaryDto>> GetAllAsync(CancellationToken ct = default)
+    {
+        var participants = await _uow.Participants.GetAllAsync(ct);
+        var programs = await _uow.Programs.GetAllAsync(ct);
         var programMap = programs.ToDictionary(p => p.Id, p => p.Name);
 
         var slugMap = programs.ToDictionary(p => p.Id, p => p.Slug);
 
-        // Attendance % is computed from real records (#8), not the stale seeded column.
-        var pctMap = AttendanceStats.PercentByParticipant(await _uow.Attendance.GetAllAsync());
+        // Attendance % from SQL-side aggregates (#8/#11) — no whole-ledger load.
+        var pctMap = AttendanceStats.PercentByParticipant(await _stats.GetParticipantAttendanceAsync(ct));
         return participants.Select(p => ToSummary(p, programMap, slugMap, pctMap)).ToList();
     }
 

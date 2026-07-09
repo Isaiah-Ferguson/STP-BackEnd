@@ -37,7 +37,7 @@ public class ProgressController : ControllerBase
     {
         if (dto.ParticipantId == Guid.Empty || dto.SubSkillId == Guid.Empty || string.IsNullOrWhiteSpace(dto.MonthKey) || dto.WeekNumber < 1)
             return BadRequest("participantId, subSkillId, monthKey and a weekNumber ≥ 1 are required.");
-        return Ok(await _service.RecordWeeklyScoreAsync(CurrentUserId(), dto));
+        return Ok(await _service.RecordWeeklyScoreAsync(User.GetUserId(), dto));
     }
 
     [HttpGet("star/{participantId:guid}")]
@@ -61,7 +61,7 @@ public class ProgressController : ControllerBase
         Guid participantId, [FromQuery] string month, [FromBody] ConfirmMonthEndDto dto)
     {
         if (string.IsNullOrWhiteSpace(month) || dto.SubSkillId == Guid.Empty) return BadRequest("month and subSkillId are required.");
-        var result = await _service.ConfirmMonthEndAsync(CurrentUserId(), participantId, month, dto);
+        var result = await _service.ConfirmMonthEndAsync(User.GetUserId(), participantId, month, dto);
         return result is null ? NotFound() : Ok(result);
     }
 
@@ -81,11 +81,5 @@ public class ProgressController : ControllerBase
         if (string.IsNullOrWhiteSpace(month)) return BadRequest("month is required.");
         var result = await _service.UpsertMonthlySummaryAsync(participantId, month, dto);
         return result is null ? NotFound() : Ok(result);
-    }
-
-    private Guid CurrentUserId()
-    {
-        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-        return Guid.TryParse(idClaim, out var id) ? id : Guid.Empty;
     }
 }
