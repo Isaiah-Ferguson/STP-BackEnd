@@ -98,8 +98,16 @@ public class ProgramService : IProgramService
             .Take(5)
             .ToList();
 
-        var allStaff = await _uow.Staff.GetAllAsync();
-        var allAssignments = (await _uow.Programs.GetAllAsync()); // nav not loaded; use UoW.Staff approach below
+        // Staff list: resolve via StaffProgramAssignments so program detail actually
+        // returns its staff (was a dead query + always-empty list).
+        var assignments = await _uow.GetStaffProgramAssignmentsAsync();
+        var staffIds = assignments
+            .Where(a => a.ProgramId == program.Id)
+            .Select(a => a.StaffMemberId)
+            .ToHashSet();
+        var staff = staffIds.Count == 0
+            ? new List<StaffMember>()
+            : (await _uow.Staff.ListAsync(s => staffIds.Contains(s.Id))).ToList();
 
         var summary = await GetBySlugAsync(slug);
 
@@ -137,7 +145,19 @@ public class ProgramService : IProgramService
                 ProgramName = program.Name,
                 IsUpcoming = e.IsUpcoming,
             }).ToList(),
-            Staff = new(),
+            Staff = staff
+                .OrderBy(s => s.FullName)
+                .Select(s => new StaffSummaryDto
+                {
+                    Id = s.Id,
+                    FullName = s.FullName,
+                    Initials = s.Initials,
+                    Role = s.Role,
+                    StartDate = s.StartDate.ToString("yyyy-MM-dd"),
+                    OnboardingProgressPct = s.OnboardingProgressPct,
+                    ProgramNames = new List<string> { program.Name },
+                })
+                .ToList(),
             Alerts = participants
                 .Where(p => p.Status == Domain.Enums.ParticipantStatus.Attention)
                 .Select(p => new ProgramAlertDto

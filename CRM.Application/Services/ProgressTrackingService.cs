@@ -25,26 +25,36 @@ public class ProgressTrackingService : IProgressTrackingService
 
     public async Task<IReadOnlyList<WeeklyFocusSkillDto>> SetFocusSkillsAsync(SetFocusSkillsDto dto)
     {
+        // Diff against what's stored instead of delete-all-then-reinsert (#28): unchanged
+        // rows are left untouched, so a no-op save issues no writes at all.
         var existing = await _uow.WeeklyFocusSkills.ListAsync(
             f => f.ProgramId == dto.ProgramId && f.MonthKey == dto.MonthKey && f.WeekNumber == dto.WeekNumber);
-        foreach (var old in existing)
-            await _uow.WeeklyFocusSkills.DeleteAsync(old);
+        var wanted = dto.SubSkillIds.Distinct().ToHashSet();
 
-        foreach (var subId in dto.SubSkillIds.Distinct())
-            await _uow.WeeklyFocusSkills.AddAsync(new WeeklyFocusSkill
+        var kept = new List<WeeklyFocusSkill>();
+        foreach (var old in existing)
+        {
+            if (wanted.Contains(old.SubSkillId)) kept.Add(old);
+            else await _uow.WeeklyFocusSkills.DeleteAsync(old);
+        }
+
+        var keptIds = kept.Select(f => f.SubSkillId).ToHashSet();
+        foreach (var subId in wanted.Where(id => !keptIds.Contains(id)))
+        {
+            kept.Add(await _uow.WeeklyFocusSkills.AddAsync(new WeeklyFocusSkill
             {
                 ProgramId = dto.ProgramId,
                 MonthKey = dto.MonthKey,
                 WeekNumber = dto.WeekNumber,
                 SubSkillId = subId,
-            });
+            }));
+        }
 
         await _uow.SaveChangesAsync();
 
+        // Build the response from the entities in hand — no re-read (#28).
         var skills = await SubSkillMapAsync();
-        var current = await _uow.WeeklyFocusSkills.ListAsync(
-            f => f.ProgramId == dto.ProgramId && f.MonthKey == dto.MonthKey && f.WeekNumber == dto.WeekNumber);
-        return current.Select(f => ToFocusDto(f, skills)).ToList();
+        return kept.Select(f => ToFocusDto(f, skills)).ToList();
     }
 
     public async Task<WeeklyDataEntryDto> RecordWeeklyScoreAsync(Guid currentUserId, RecordWeeklyScoreDto dto)

@@ -85,6 +85,4 @@ public class UnitOfWork : IUnitOfWork
         await _db.Set<StaffProgramAssignment>().AddAsync(assignment);
 
     public Task<int> SaveChangesAsync() => _db.SaveChangesAsync();
-
-    public void Dispose() => _db.Dispose();
 }

@@ -2,7 +2,9 @@ using CRM.Domain.Entities;
 
 namespace CRM.Application.Interfaces;
 
-public interface IUnitOfWork : IDisposable
+// Deliberately NOT IDisposable: the DbContext is owned by the DI container (scoped),
+// so the unit of work must not dispose it.
+public interface IUnitOfWork
 {
     IRepository<Participant> Participants { get; }
     IRepository<StaffMember> Staff { get; }

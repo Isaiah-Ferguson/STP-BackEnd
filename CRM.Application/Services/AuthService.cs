@@ -191,10 +191,22 @@ public class AuthService : IAuthService
             throw new InvalidOperationException($"Cannot {verb} the last active admin.");
     }
 
+    // Known-compromised defaults that must never be (re)set: the original seeder password
+    // was committed to a public repo, so it is permanently burned (#21).
+    private static readonly string[] BlockedPasswords = ["ChangeMe!123"];
+
     private static void ValidatePassword(string password)
     {
         if (string.IsNullOrEmpty(password) || password.Length < MinPasswordLength)
             throw new InvalidOperationException($"Password must be at least {MinPasswordLength} characters.");
+
+        if (BlockedPasswords.Any(p => string.Equals(p, password, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException("That password is a known default and cannot be used. Choose a different one.");
+
+        var hasLetter = password.Any(char.IsLetter);
+        var hasDigit = password.Any(char.IsDigit);
+        if (!hasLetter || !hasDigit)
+            throw new InvalidOperationException("Password must contain at least one letter and one number.");
     }
 
     private static UserDto ToDto(User u) => new()

@@ -65,6 +65,31 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             NameClaimType = TokenService.NameClaim,
             RoleClaimType = TokenService.RoleClaim,
         };
+
+        // #20: bearer tokens live 8 hours and cannot be revoked, so deactivating a user
+        // (IsActive = false) would otherwise leave their token working until it expires.
+        // Check IsActive on every authenticated request — one indexed PK lookup.
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async ctx =>
+            {
+                var idClaim = ctx.Principal?.FindFirst("sub")?.Value
+                              ?? ctx.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(idClaim, out var userId))
+                {
+                    ctx.Fail("Token has no valid user id.");
+                    return;
+                }
+
+                var db = ctx.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+                var isActive = await db.Users.AsNoTracking()
+                    .Where(u => u.Id == userId)
+                    .Select(u => (bool?)u.IsActive)
+                    .FirstOrDefaultAsync();
+                if (isActive != true)
+                    ctx.Fail("Account is deactivated or no longer exists.");
+            },
+        };
     });
 
 builder.Services.AddAuthorization(options =>

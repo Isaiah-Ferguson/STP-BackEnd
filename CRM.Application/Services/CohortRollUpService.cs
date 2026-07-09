@@ -13,16 +13,26 @@ public class CohortRollUpService : ICohortRollUpService
 
     public async Task<CohortRollUpDto> GetRollUpAsync(string monthKey, Guid? programId)
     {
-        // Only confirmed snapshots count toward the roll-up.
-        var snaps = (await _uow.MonthlyProgressSnapshots.ListAsync(s => s.MonthKey == monthKey && s.IsConfirmed)).ToList();
-
+        // Only confirmed snapshots count toward the roll-up. When scoped to a program,
+        // resolve the participant ids first so the snapshot filter runs in SQL
+        // (Contains translates to IN) instead of loading the whole month and filtering
+        // in memory (#29).
         string? programName = null;
+        IReadOnlyList<Domain.Entities.MonthlyProgressSnapshot> snaps;
         if (programId is { } pid)
         {
             var program = await _uow.Programs.GetByIdAsync(pid);
             programName = program?.Name;
-            var inProgram = (await _uow.Participants.ListAsync(p => p.ProgramId == pid)).Select(p => p.Id).ToHashSet();
-            snaps = snaps.Where(s => inProgram.Contains(s.ParticipantId)).ToList();
+            var inProgram = (await _uow.Participants.ListAsync(p => p.ProgramId == pid))
+                .Select(p => p.Id)
+                .ToHashSet();
+            snaps = await _uow.MonthlyProgressSnapshots.ListAsync(
+                s => s.MonthKey == monthKey && s.IsConfirmed && inProgram.Contains(s.ParticipantId));
+        }
+        else
+        {
+            snaps = await _uow.MonthlyProgressSnapshots.ListAsync(
+                s => s.MonthKey == monthKey && s.IsConfirmed);
         }
 
         var subSkills = (await _uow.SubSkills.GetAllAsync()).Where(s => s.IsActive).ToList();
