@@ -6,6 +6,7 @@ using CRM.Application.Interfaces;
 using CRM.Infrastructure;
 using CRM.Infrastructure.Auth;
 using CRM.Persistence;
+using CRM.Persistence.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +23,7 @@ builder.Services.AddPersistenceServices(builder.Configuration);
 // ---------------------------------------------------------
 // Controllers + problem details
 // ---------------------------------------------------------
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddControllers()
     .AddJsonOptions(opts =>

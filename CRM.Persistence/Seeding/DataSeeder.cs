@@ -1,10 +1,9 @@
 using CRM.Application.Interfaces;
 using CRM.Domain.Entities;
 using CRM.Domain.Enums;
-using CRM.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace CRM.API;
+namespace CRM.Persistence.Seeding;
 
 public static class DataSeeder
 {

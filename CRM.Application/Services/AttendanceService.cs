@@ -184,6 +184,45 @@ public class AttendanceService : IAttendanceService
         }
         if (created) await _uow.SaveChangesAsync();
 
+        return await BuildSessionRosterAsync(program, session, participants, recordByParticipant);
+    }
+
+    public async Task<SessionRosterDto?> GetProgramSessionReadOnlyAsync(Guid userId, Guid programId, DateTime date)
+    {
+        var day = date.Date;
+        var nextDay = day.AddDays(1);
+
+        var program = await _uow.Programs.GetByIdAsync(programId);
+        if (program is null) return null;
+
+        var (isAdmin, staffMemberId) = await ResolveUserAsync(userId);
+        var allowed = await AllowedProgramIdsAsync(isAdmin, staffMemberId, new[] { program });
+        if (!allowed.Contains(programId))
+            throw new UnauthorizedAccessException("You are not assigned to this program.");
+
+        // Read-only (#23): a GET must never create sessions or records — prefetches and
+        // crawlers were able to open sessions for programs that never met.
+        var session = (await _uow.Sessions.ListAsync(s => s.ProgramId == programId && s.Date >= day && s.Date < nextDay))
+            .FirstOrDefault();
+        if (session is null) return null;
+
+        var participants = await _uow.Participants.ListAsync(
+            p => p.ProgramId == programId && p.Status == ParticipantStatus.Active);
+
+        var recordByParticipant = (await _uow.Attendance.ListAsync(r => r.SessionId == session.Id))
+            .GroupBy(r => r.ParticipantId)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        return await BuildSessionRosterAsync(program, session, participants, recordByParticipant);
+    }
+
+    /// <summary>Assembles the roster DTO from already-loaded session/participants/records. Loads notes.</summary>
+    private async Task<SessionRosterDto> BuildSessionRosterAsync(
+        CrmProgram program,
+        Session session,
+        IReadOnlyList<Participant> participants,
+        Dictionary<Guid, AttendanceRecord> recordByParticipant)
+    {
         var recordIds = recordByParticipant.Values.Select(r => r.Id).ToHashSet();
         var notesByRecord = (recordIds.Count == 0
                 ? new List<AttendanceNote>()

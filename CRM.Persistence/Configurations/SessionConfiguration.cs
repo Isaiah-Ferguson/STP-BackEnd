@@ -18,9 +18,12 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
         // the same program concurrently.
         builder.HasIndex(s => new { s.ProgramId, s.Date }).IsUnique();
 
+        // Restrict, not Cascade: deleting a program must never silently erase the
+        // attendance ledger (Sessions → AttendanceRecords). Sessions have to be
+        // removed deliberately first.
         builder.HasOne(s => s.Program)
                .WithMany(p => p.Sessions)
                .HasForeignKey(s => s.ProgramId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

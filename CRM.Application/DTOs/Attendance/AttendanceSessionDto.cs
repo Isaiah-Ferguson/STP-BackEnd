@@ -55,6 +55,14 @@ public class CreateAttendanceNoteDto
     public string NoteType { get; set; } = "observation";
 }
 
+/// <summary>Body for POST /api/attendance/session — opens (get-or-creates) a program's session for a date.</summary>
+public class OpenSessionDto
+{
+    public Guid ProgramId { get; set; }
+    /// <summary>Defaults to today (UTC) when omitted.</summary>
+    public DateTime? Date { get; set; }
+}
+
 /// <summary>
 /// A card on the attendance landing page: one program meeting on a given date,
 /// scoped to the current user's programs. <see cref="SessionId"/> is null until

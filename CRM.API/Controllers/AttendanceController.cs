@@ -37,7 +37,10 @@ public class AttendanceController : ControllerBase
         return Ok(await _service.GetScheduledForUserAsync(CurrentUserId(), when));
     }
 
-    /// <summary>Gets or creates the session for a program on a date and returns its roster.</summary>
+    /// <summary>
+    /// Reads a program's session roster for a date — creates nothing (#23).
+    /// Returns 404 if no session has been opened; use <c>POST session</c> to open one.
+    /// </summary>
     [HttpGet("session")]
     public async Task<ActionResult<SessionRosterDto>> GetSessionByProgram(
         [FromQuery] Guid programId, [FromQuery] DateTime? date)
@@ -45,7 +48,23 @@ public class AttendanceController : ControllerBase
         var when = date?.Date ?? DateTime.UtcNow.Date;
         try
         {
-            var roster = await _service.GetOrCreateSessionAsync(CurrentUserId(), programId, when);
+            var roster = await _service.GetProgramSessionReadOnlyAsync(CurrentUserId(), programId, when);
+            return roster is null ? NotFound() : Ok(roster);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+        }
+    }
+
+    /// <summary>Opens (gets or creates) the session for a program on a date and returns its roster.</summary>
+    [HttpPost("session")]
+    public async Task<ActionResult<SessionRosterDto>> OpenSession([FromBody] OpenSessionDto dto)
+    {
+        var when = dto.Date?.Date ?? DateTime.UtcNow.Date;
+        try
+        {
+            var roster = await _service.GetOrCreateSessionAsync(CurrentUserId(), dto.ProgramId, when);
             return roster is null ? NotFound() : Ok(roster);
         }
         catch (UnauthorizedAccessException ex)

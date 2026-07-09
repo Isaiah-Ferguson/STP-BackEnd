@@ -1,6 +1,6 @@
 using CRM.Domain.Enums;
 
-namespace CRM.API;
+namespace CRM.Persistence.Seeding;
 
 /// <summary>Canonical Games Library seed rows, transcribed from the Annual Programming Calendar spreadsheet.</summary>
 public record GameSeedRow(

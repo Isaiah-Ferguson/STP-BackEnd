@@ -40,6 +40,13 @@ public interface IAttendanceService
     Task<SessionRosterDto?> GetOrCreateSessionAsync(Guid userId, Guid programId, DateTime date);
 
     /// <summary>
+    /// Read-only variant (#23): the roster for a program's session on a date, creating
+    /// nothing. Returns null if the program or session does not exist; throws
+    /// <see cref="UnauthorizedAccessException"/> if the user is not assigned to the program.
+    /// </summary>
+    Task<SessionRosterDto?> GetProgramSessionReadOnlyAsync(Guid userId, Guid programId, DateTime date);
+
+    /// <summary>
     /// Finalizes a session: marks it Submitted and locks its records. Returns false if the
     /// session is not found; throws <see cref="UnauthorizedAccessException"/> if the user is
     /// not assigned to the session's program.
