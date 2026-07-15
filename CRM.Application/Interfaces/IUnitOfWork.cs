@@ -37,6 +37,7 @@ public interface IUnitOfWork
     IRepository<ProjectTask> Tasks { get; }
     IRepository<Script> Scripts { get; }
     IRepository<OnboardingItem> OnboardingItems { get; }
+    IRepository<ChecklistTemplateItem> ChecklistTemplateItems { get; }
     IRepository<User> Users { get; }
     IRepository<RefreshToken> RefreshTokens { get; }
 
@@ -44,6 +45,7 @@ public interface IUnitOfWork
     // so it is exposed via dedicated methods rather than a generic repository.
     Task<IReadOnlyList<StaffProgramAssignment>> GetStaffProgramAssignmentsAsync();
     Task AddStaffProgramAssignmentAsync(StaffProgramAssignment assignment);
+    Task RemoveStaffProgramAssignmentAsync(Guid staffMemberId, Guid programId);
 
     Task<int> SaveChangesAsync();
 }

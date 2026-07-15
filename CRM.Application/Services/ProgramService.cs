@@ -162,6 +162,7 @@ public class ProgramService : IProgramService
                 {
                     Severity = "Warning",
                     Message = $"{p.FullName} needs attention",
+                    ParticipantId = p.Id,
                 }).ToList(),
         };
     }
@@ -221,5 +222,35 @@ public class ProgramService : IProgramService
 
         // Reuse the full summary computation (enrolled/attendance/next session).
         return await GetBySlugAsync(program.Slug);
+    }
+
+    public async Task<bool> AssignStaffAsync(Guid programId, Guid staffMemberId)
+    {
+        var program = await _uow.Programs.GetByIdAsync(programId);
+        var staff = await _uow.Staff.GetByIdAsync(staffMemberId);
+        if (program is null || staff is null) return false;
+
+        var assignments = await _uow.GetStaffProgramAssignmentsAsync();
+        if (assignments.Any(a => a.ProgramId == programId && a.StaffMemberId == staffMemberId))
+            return true; // already assigned — idempotent
+
+        await _uow.AddStaffProgramAssignmentAsync(new StaffProgramAssignment
+        {
+            ProgramId = programId,
+            StaffMemberId = staffMemberId,
+        });
+        await _uow.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> UnassignStaffAsync(Guid programId, Guid staffMemberId)
+    {
+        var program = await _uow.Programs.GetByIdAsync(programId);
+        var staff = await _uow.Staff.GetByIdAsync(staffMemberId);
+        if (program is null || staff is null) return false;
+
+        await _uow.RemoveStaffProgramAssignmentAsync(staffMemberId, programId);
+        await _uow.SaveChangesAsync();
+        return true;
     }
 }

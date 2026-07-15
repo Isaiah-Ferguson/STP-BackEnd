@@ -60,6 +60,40 @@ public static class DataSeeder
         await db.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Seeds the master onboarding checklist template (copied onto each new staff
+    /// member at creation). Reference data, seeded in every environment; idempotent —
+    /// no-ops once any template item exists so admin edits are never overwritten.
+    /// </summary>
+    public static async Task SeedChecklistTemplateAsync(AppDbContext db)
+    {
+        if (await db.ChecklistTemplateItems.AnyAsync()) return;
+
+        var defaults = new (string Section, string Label)[]
+        {
+            ("HR & Compliance",     "W-4 / I-9 completed"),
+            ("HR & Compliance",     "Background check cleared"),
+            ("HR & Compliance",     "Emergency contact form submitted"),
+            ("Training",            "Program overview training"),
+            ("Training",            "Child safety & mandated reporter training"),
+            ("Training",            "First aid / CPR certification"),
+            ("Program Requirements","Liability waiver signed"),
+            ("Program Requirements","Code of conduct acknowledged"),
+            ("Program Requirements","Media release policy reviewed"),
+            ("Access & Setup",      "Staff email account created"),
+            ("Access & Setup",      "Program schedule provided"),
+            ("Access & Setup",      "Participant roster access granted"),
+        };
+
+        db.ChecklistTemplateItems.AddRange(defaults.Select((d, i) => new ChecklistTemplateItem
+        {
+            Section = d.Section,
+            Label = d.Label,
+            SortOrder = i,
+        }));
+        await db.SaveChangesAsync();
+    }
+
     public static async Task SeedAsync(AppDbContext db)
     {
         if (await db.Programs.AnyAsync()) return;
@@ -149,13 +183,16 @@ public static class DataSeeder
 
         // ── Calendar events ───────────────────────────────────────────────────
 
+        // Dates are relative to today so a fresh seed always has upcoming events
+        // on the dashboard, no matter when the database is created.
+        var today = DateTime.UtcNow.Date;
         db.CalendarEvents.AddRange(
-            new CalendarEvent { Title = "Spring Showcase Rehearsal", Date = new DateTime(2026, 6, 14), ProgramId = mjc.Id,      Meta = "Full cast · Main Stage",            IsUpcoming = true },
-            new CalendarEvent { Title = "End-of-term Assessment",    Date = new DateTime(2026, 6, 20), ProgramId = mjc.Id,      Meta = "Room B · Rachel M.",                 IsUpcoming = true },
-            new CalendarEvent { Title = "Regional Theatre Workshop",  Date = new DateTime(2026, 6, 21), ProgramId = pathways.Id, Meta = "All Pathways students · Bus 9 AM",  IsUpcoming = true },
-            new CalendarEvent { Title = "Mid-term Check-in",          Date = new DateTime(2026, 6, 24), ProgramId = pathways.Id, Meta = "Room C · Joss K.",                  IsUpcoming = true },
-            new CalendarEvent { Title = "Script Reading",             Date = new DateTime(2026, 6, 18), ProgramId = manteca.Id,  Meta = "Room A · Devon P.",                 IsUpcoming = true },
-            new CalendarEvent { Title = "Parent Observation",         Date = new DateTime(2026, 6, 25), ProgramId = manteca.Id,  Meta = "Gym B · All families welcome",      IsUpcoming = true }
+            new CalendarEvent { Title = "Spring Showcase Rehearsal", Date = today.AddDays(2),  ProgramId = mjc.Id,      Meta = "Full cast · Main Stage",            IsUpcoming = true },
+            new CalendarEvent { Title = "End-of-term Assessment",    Date = today.AddDays(8),  ProgramId = mjc.Id,      Meta = "Room B · Rachel M.",                 IsUpcoming = true },
+            new CalendarEvent { Title = "Regional Theatre Workshop",  Date = today.AddDays(9),  ProgramId = pathways.Id, Meta = "All Pathways students · Bus 9 AM",  IsUpcoming = true },
+            new CalendarEvent { Title = "Mid-term Check-in",          Date = today.AddDays(12), ProgramId = pathways.Id, Meta = "Room C · Joss K.",                  IsUpcoming = true },
+            new CalendarEvent { Title = "Script Reading",             Date = today.AddDays(5),  ProgramId = manteca.Id,  Meta = "Room A · Devon P.",                 IsUpcoming = true },
+            new CalendarEvent { Title = "Parent Observation",         Date = today.AddDays(13), ProgramId = manteca.Id,  Meta = "Gym B · All families welcome",      IsUpcoming = true }
         );
 
         // ── Staff-program assignments ─────────────────────────────────────────

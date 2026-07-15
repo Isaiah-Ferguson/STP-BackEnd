@@ -53,4 +53,14 @@ public class ProgramsController : ControllerBase
         var result = await _service.UpdateAsync(id, dto);
         return result is null ? NotFound() : Ok(result);
     }
+
+    [HttpPost("{id:guid}/staff/{staffId:guid}")]
+    [Authorize(Policy = "ManagementWrite")]
+    public async Task<IActionResult> AssignStaff(Guid id, Guid staffId) =>
+        await _service.AssignStaffAsync(id, staffId) ? NoContent() : NotFound();
+
+    [HttpDelete("{id:guid}/staff/{staffId:guid}")]
+    [Authorize(Policy = "ManagementWrite")]
+    public async Task<IActionResult> UnassignStaff(Guid id, Guid staffId) =>
+        await _service.UnassignStaffAsync(id, staffId) ? NoContent() : NotFound();
 }

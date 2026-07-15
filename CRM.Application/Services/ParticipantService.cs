@@ -122,5 +122,7 @@ public class ParticipantService : IParticipantService
             AttendancePct = pctMap?.GetValueOrDefault(p.Id, 0) ?? p.AttendancePct,
             StartDate = p.StartDate.ToString("yyyy-MM-dd"),
             HasDocAlerts = false,
+            BirthYear = p.BirthYear,
+            ServiceCoordinator = p.ServiceCoordinator,
         };
 }

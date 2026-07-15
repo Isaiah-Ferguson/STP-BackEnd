@@ -221,6 +221,10 @@ using (var scope = app.Services.CreateScope())
     // working demo (#18, explicit client request). Idempotent — no-ops once any script exists.
     await DataSeeder.SeedScriptsAsync(db);
 
+    // Master onboarding checklist template — reference data used to issue each new
+    // staff member's checklist. Idempotent — no-ops once any template item exists.
+    await DataSeeder.SeedChecklistTemplateAsync(db);
+
     // Demo data is DEVELOPMENT-ONLY. These seeders create demo participants/staff/attendance
     // (#4) and default logins with the publicly-known password `ChangeMe!123` (#3). Running
     // them in production once filled the live CRM with fake records ("Kezia Morales") and

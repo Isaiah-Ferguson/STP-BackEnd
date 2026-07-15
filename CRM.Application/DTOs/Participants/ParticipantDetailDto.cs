@@ -4,8 +4,6 @@ namespace CRM.Application.DTOs.Participants;
 
 public class ParticipantDetailDto : ParticipantSummaryDto
 {
-    public int? BirthYear { get; set; }
-    public string? ServiceCoordinator { get; set; }
     public List<DocumentRecordDto> Documents { get; set; } = new();
     public List<AttendanceRecordDto> RecentAttendance { get; set; } = new();
 }

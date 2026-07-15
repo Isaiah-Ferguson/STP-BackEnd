@@ -40,4 +40,21 @@ public class StaffController : ControllerBase
         var result = await _service.UpdateAsync(id, dto);
         return result is null ? NotFound() : Ok(result);
     }
+
+    [HttpPut("{id:guid}/onboarding/{itemId:guid}")]
+    [Authorize(Policy = "ManagementWrite")]
+    public async Task<ActionResult<StaffDetailDto>> SetOnboardingItem(Guid id, Guid itemId, [FromBody] SetOnboardingItemDto dto)
+    {
+        var result = await _service.SetOnboardingItemAsync(id, itemId, dto.IsCompleted);
+        return result is null ? NotFound() : Ok(result);
+    }
+
+    [HttpGet("checklist-template")]
+    public async Task<ActionResult<IReadOnlyList<ChecklistTemplateItemDto>>> GetChecklistTemplate() =>
+        Ok(await _service.GetChecklistTemplateAsync());
+
+    [HttpPut("checklist-template")]
+    [Authorize(Policy = "ManagementWrite")]
+    public async Task<ActionResult<IReadOnlyList<ChecklistTemplateItemDto>>> UpdateChecklistTemplate([FromBody] UpdateChecklistTemplateDto dto) =>
+        Ok(await _service.UpdateChecklistTemplateAsync(dto));
 }

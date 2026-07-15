@@ -41,6 +41,7 @@ public class AppDbContext : DbContext
     public DbSet<ScriptProgram> ScriptPrograms { get; set; }
     public DbSet<DocumentRecord> DocumentRecords { get; set; }
     public DbSet<OnboardingItem> OnboardingItems { get; set; }
+    public DbSet<ChecklistTemplateItem> ChecklistTemplateItems { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 

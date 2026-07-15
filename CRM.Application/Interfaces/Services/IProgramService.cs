@@ -15,4 +15,10 @@ public interface IProgramService
 
     /// <summary>Updates a program's editable fields by id (slug is immutable). Returns null if not found.</summary>
     Task<ProgramSummaryDto?> UpdateAsync(Guid id, UpdateProgramDto dto);
+
+    /// <summary>Assigns a staff member to a program. Idempotent. Returns false if either id is unknown.</summary>
+    Task<bool> AssignStaffAsync(Guid programId, Guid staffMemberId);
+
+    /// <summary>Removes a staff member from a program. Returns false if either id is unknown.</summary>
+    Task<bool> UnassignStaffAsync(Guid programId, Guid staffMemberId);
 }

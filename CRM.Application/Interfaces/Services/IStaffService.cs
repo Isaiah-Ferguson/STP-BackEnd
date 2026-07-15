@@ -8,4 +8,7 @@ public interface IStaffService
     Task<StaffDetailDto?> GetByIdAsync(Guid id);
     Task<StaffDetailDto> CreateAsync(CreateStaffDto dto);
     Task<StaffDetailDto?> UpdateAsync(Guid id, UpdateStaffDto dto);
+    Task<StaffDetailDto?> SetOnboardingItemAsync(Guid staffId, Guid itemId, bool isCompleted);
+    Task<IReadOnlyList<ChecklistTemplateItemDto>> GetChecklistTemplateAsync();
+    Task<IReadOnlyList<ChecklistTemplateItemDto>> UpdateChecklistTemplateAsync(UpdateChecklistTemplateDto dto);
 }

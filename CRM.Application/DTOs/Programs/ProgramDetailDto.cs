@@ -24,4 +24,6 @@ public class ProgramAlertDto
 {
     public string Severity { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
+    /// <summary>The participant this alert is about, when applicable — lets the UI link straight to their profile.</summary>
+    public Guid? ParticipantId { get; set; }
 }

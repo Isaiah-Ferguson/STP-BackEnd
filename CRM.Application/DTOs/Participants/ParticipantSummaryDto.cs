@@ -14,4 +14,6 @@ public class ParticipantSummaryDto
     public int AttendancePct { get; set; }
     public string StartDate { get; set; } = string.Empty;
     public bool HasDocAlerts { get; set; }
+    public int? BirthYear { get; set; }
+    public string? ServiceCoordinator { get; set; }
 }

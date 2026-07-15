@@ -42,6 +42,7 @@ public class UnitOfWork : IUnitOfWork
         Tasks = new GenericRepository<ProjectTask>(db);
         Scripts = new GenericRepository<Script>(db);
         OnboardingItems = new GenericRepository<OnboardingItem>(db);
+        ChecklistTemplateItems = new GenericRepository<ChecklistTemplateItem>(db);
         Users = new GenericRepository<User>(db);
         RefreshTokens = new GenericRepository<RefreshToken>(db);
     }
@@ -77,6 +78,7 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<ProjectTask> Tasks { get; }
     public IRepository<Script> Scripts { get; }
     public IRepository<OnboardingItem> OnboardingItems { get; }
+    public IRepository<ChecklistTemplateItem> ChecklistTemplateItems { get; }
     public IRepository<User> Users { get; }
     public IRepository<RefreshToken> RefreshTokens { get; }
 
@@ -85,6 +87,13 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task AddStaffProgramAssignmentAsync(StaffProgramAssignment assignment) =>
         await _db.Set<StaffProgramAssignment>().AddAsync(assignment);
+
+    public async Task RemoveStaffProgramAssignmentAsync(Guid staffMemberId, Guid programId)
+    {
+        var existing = await _db.Set<StaffProgramAssignment>()
+            .FirstOrDefaultAsync(a => a.StaffMemberId == staffMemberId && a.ProgramId == programId);
+        if (existing is not null) _db.Set<StaffProgramAssignment>().Remove(existing);
+    }
 
     public Task<int> SaveChangesAsync() => _db.SaveChangesAsync();
 }
