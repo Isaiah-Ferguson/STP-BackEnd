@@ -19,6 +19,7 @@ public class StaffController : ControllerBase
         Ok(await _service.GetAllAsync(ct));
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<StaffDetailDto>> GetById(Guid id)
     {
         var result = await _service.GetByIdAsync(id);
@@ -50,6 +51,7 @@ public class StaffController : ControllerBase
     }
 
     [HttpGet("checklist-template")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<IReadOnlyList<ChecklistTemplateItemDto>>> GetChecklistTemplate() =>
         Ok(await _service.GetChecklistTemplateAsync());
 

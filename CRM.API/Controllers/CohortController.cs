@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CRM.API.Controllers;
 
 [ApiController]
-[Authorize]
+[Authorize(Roles = "Admin")]
 [Route("api/cohort")]
 public class CohortController : ControllerBase
 {
