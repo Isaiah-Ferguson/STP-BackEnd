@@ -235,6 +235,9 @@ using (var scope = app.Services.CreateScope())
         await DataSeeder.SeedAsync(db);
         await DataSeeder.SeedAdminUserAsync(db, hasher);
         await DataSeeder.SeedSampleAttendanceAsync(db);
+        await DataSeeder.SeedRosterAsync(db);
+        await DataSeeder.SeedTrackerAsync(db);
+        await DataSeeder.SeedYearCalendarAsync(db);
     }
 }
 
