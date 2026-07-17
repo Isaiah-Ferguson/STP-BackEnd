@@ -47,5 +47,10 @@ public interface IUnitOfWork
     Task AddStaffProgramAssignmentAsync(StaffProgramAssignment assignment);
     Task RemoveStaffProgramAssignmentAsync(Guid staffMemberId, Guid programId);
 
+    // ScriptProgram is a join entity with a composite PK (no BaseEntity), so it is
+    // managed via dedicated methods rather than a generic repository.
+    Task<IReadOnlyList<ScriptProgram>> GetScriptProgramsAsync();
+    Task ReplaceScriptProgramsAsync(Guid scriptId, IReadOnlyCollection<Guid> programIds);
+
     Task<int> SaveChangesAsync();
 }

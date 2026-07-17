@@ -55,5 +55,17 @@ public class UpdateScriptDto
 
     public ScriptType? Type { get; set; }
     public ScriptStatus? Status { get; set; }
+    public bool? IsOriginal { get; set; }
+    public bool? IsAdapted { get; set; }
+
+    [Range(0, 1000)]
+    public int? CastMin { get; set; }
+
+    [Range(0, 1000)]
+    public int? CastMax { get; set; }
+
+    [StringLength(50)]
+    public string? Duration { get; set; }
+
     public List<Guid>? ProgramIds { get; set; }
 }

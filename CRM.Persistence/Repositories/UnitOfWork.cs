@@ -95,5 +95,25 @@ public class UnitOfWork : IUnitOfWork
         if (existing is not null) _db.Set<StaffProgramAssignment>().Remove(existing);
     }
 
+    public async Task<IReadOnlyList<ScriptProgram>> GetScriptProgramsAsync() =>
+        await _db.Set<ScriptProgram>().AsNoTracking().ToListAsync();
+
+    public async Task ReplaceScriptProgramsAsync(Guid scriptId, IReadOnlyCollection<Guid> programIds)
+    {
+        var existing = await _db.Set<ScriptProgram>()
+            .Where(sp => sp.ScriptId == scriptId)
+            .ToListAsync();
+        _db.Set<ScriptProgram>().RemoveRange(existing);
+
+        // De-dupe and ignore any ids that aren't real programs (e.g. the virtual
+        // "productions" tag has no backing program row).
+        var validProgramIds = await _db.Set<CrmProgram>()
+            .Where(p => programIds.Contains(p.Id))
+            .Select(p => p.Id)
+            .ToListAsync();
+        foreach (var programId in validProgramIds.Distinct())
+            _db.Set<ScriptProgram>().Add(new ScriptProgram { ScriptId = scriptId, ProgramId = programId });
+    }
+
     public Task<int> SaveChangesAsync() => _db.SaveChangesAsync();
 }

@@ -14,13 +14,16 @@ public class ScriptService : IScriptService
     public async Task<IReadOnlyList<ScriptDto>> GetAllAsync()
     {
         var scripts = await _uow.Scripts.GetAllAsync();
-        return scripts.Select(s => ToDto(s)).ToList();
+        var namesByScript = await BuildProgramNameMapAsync();
+        return scripts.Select(s => ToDto(s, namesByScript.GetValueOrDefault(s.Id))).ToList();
     }
 
     public async Task<ScriptDto?> GetByIdAsync(Guid id)
     {
         var script = await _uow.Scripts.GetByIdAsync(id);
-        return script is null ? null : ToDto(script);
+        if (script is null) return null;
+        var namesByScript = await BuildProgramNameMapAsync();
+        return ToDto(script, namesByScript.GetValueOrDefault(id));
     }
 
     public async Task<ScriptDto> CreateAsync(CreateScriptDto dto)
@@ -41,7 +44,10 @@ public class ScriptService : IScriptService
         await _uow.Scripts.AddAsync(script);
         await _uow.SaveChangesAsync();
 
-        return ToDto(script);
+        await _uow.ReplaceScriptProgramsAsync(script.Id, dto.ProgramIds);
+        await _uow.SaveChangesAsync();
+
+        return await GetByIdAsync(script.Id) ?? ToDto(script, null);
     }
 
     public async Task<ScriptDto?> UpdateAsync(Guid id, UpdateScriptDto dto)
@@ -49,18 +55,47 @@ public class ScriptService : IScriptService
         var script = await _uow.Scripts.GetByIdAsync(id);
         if (script is null) return null;
 
+        // PUT is a full edit from the Script Library form: apply every provided field.
         if (dto.Title is not null) script.Title = dto.Title;
-        if (dto.Subtitle is not null) script.Subtitle = dto.Subtitle;
+        script.Subtitle = dto.Subtitle;
         if (dto.Type.HasValue) script.Type = dto.Type.Value;
         if (dto.Status.HasValue) script.Status = dto.Status.Value;
+        if (dto.IsOriginal.HasValue) script.IsOriginal = dto.IsOriginal.Value;
+        if (dto.IsAdapted.HasValue) script.IsAdapted = dto.IsAdapted.Value;
+        script.CastMin = dto.CastMin;
+        script.CastMax = dto.CastMax;
+        script.Duration = dto.Duration;
 
         await _uow.Scripts.UpdateAsync(script);
+
+        if (dto.ProgramIds is not null)
+            await _uow.ReplaceScriptProgramsAsync(id, dto.ProgramIds);
+
         await _uow.SaveChangesAsync();
 
-        return ToDto(script);
+        return await GetByIdAsync(id);
     }
 
-    private static ScriptDto ToDto(Script s) => new()
+    /// <summary>scriptId → the display names of the programs it's linked to.</summary>
+    private async Task<Dictionary<Guid, List<string>>> BuildProgramNameMapAsync()
+    {
+        var links = await _uow.GetScriptProgramsAsync();
+        if (links.Count == 0) return new();
+
+        var programs = await _uow.Programs.GetAllAsync();
+        var nameById = programs.ToDictionary(p => p.Id, p => p.Name);
+
+        return links
+            .GroupBy(l => l.ScriptId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(l => nameById.GetValueOrDefault(l.ProgramId))
+                      .Where(n => n is not null)
+                      .Select(n => n!)
+                      .ToList());
+    }
+
+    private static ScriptDto ToDto(Script s, List<string>? programNames) => new()
     {
         Id = s.Id,
         Title = s.Title,
@@ -73,6 +108,6 @@ public class ScriptService : IScriptService
         CastMax = s.CastMax,
         Duration = s.Duration,
         LastUsed = s.LastUsed?.ToString("yyyy-MM-dd"),
-        ProgramNames = new(),
+        ProgramNames = programNames ?? new(),
     };
 }

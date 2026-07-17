@@ -217,10 +217,6 @@ using (var scope = app.Services.CreateScope())
     // any game exists.
     await DataSeeder.SeedGamesLibraryAsync(db);
 
-    // The Script Library is kept populated in every environment so the Scripts page stays a
-    // working demo (#18, explicit client request). Idempotent — no-ops once any script exists.
-    await DataSeeder.SeedScriptsAsync(db);
-
     // Master onboarding checklist template — reference data used to issue each new
     // staff member's checklist. Idempotent — no-ops once any template item exists.
     await DataSeeder.SeedChecklistTemplateAsync(db);
@@ -239,6 +235,12 @@ using (var scope = app.Services.CreateScope())
         await DataSeeder.SeedTrackerAsync(db);
         await DataSeeder.SeedYearCalendarAsync(db);
     }
+
+    // The Script Library is kept populated in every environment so the Scripts page stays a
+    // working demo (#18, explicit client request). Runs AFTER programs exist (dev: seeded
+    // above; prod: real programs) so each script links to the programs it names by slug.
+    // Idempotent — no-ops once any script exists.
+    await DataSeeder.SeedScriptsAsync(db);
 }
 
 app.UseExceptionHandler();
