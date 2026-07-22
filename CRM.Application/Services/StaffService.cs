@@ -137,6 +137,9 @@ public class StaffService : IStaffService
         item.IsCompleted = isCompleted;
         item.CompletedDate = isCompleted ? DateTime.UtcNow.Date : null;
         await _uow.OnboardingItems.UpdateAsync(item);
+        // Flush before recounting: ListAsync reads AsNoTracking, so an unsaved
+        // toggle would come back with its old IsCompleted value.
+        await _uow.SaveChangesAsync();
 
         // Progress % is denormalized on the staff row; keep it in sync.
         var items = await _uow.OnboardingItems.ListAsync(o => o.StaffMemberId == staffId);
